@@ -1,6 +1,6 @@
 [build]
   publish = "dist"
-  command = "npm run build"
+  command = "mkdir -p dist && cp public/index.html dist/ && cp assets/favicon.png dist/ && cp public/_redirects dist/"
 
 [[redirects]]
   from = "/*"
@@ -9,4 +9,3 @@
 
 [build.environment]
   NODE_VERSION = "18"
-  NPM_FLAGS = "--legacy-peer-deps"

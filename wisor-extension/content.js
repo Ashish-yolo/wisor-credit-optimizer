@@ -27,58 +27,51 @@ class WisorContentScript {
   }
 
   startMonitoring() {
-    // Check immediately
-    this.checkAndShowRecommendation();
-    
-    // Monitor for changes (checkout page navigation, cart updates)
-    const observer = new MutationObserver(() => {
+    // Check immediately but with delay to avoid crashes
+    setTimeout(() => {
       this.checkAndShowRecommendation();
-    });
+    }, 2000);
     
-    observer.observe(document.body, {
-      childList: true,
-      subtree: true
-    });
-    
-    // Also check on URL changes (for SPAs)
-    let currentUrl = window.location.href;
-    setInterval(() => {
-      if (window.location.href !== currentUrl) {
-        currentUrl = window.location.href;
-        this.merchantDetector.detectCheckoutPage();
-        this.checkAndShowRecommendation();
+    // Very limited monitoring to avoid performance issues
+    let hasChecked = false;
+    const lightObserver = new MutationObserver(() => {
+      if (!hasChecked) {
+        hasChecked = true;
+        setTimeout(() => {
+          this.checkAndShowRecommendation();
+          hasChecked = false;
+        }, 3000);
       }
-    }, 1000);
+    });
+    
+    // Only observe major changes
+    lightObserver.observe(document.body, {
+      childList: true,
+      subtree: false
+    });
   }
 
   checkAndShowRecommendation() {
-    const isCheckout = this.merchantDetector.detectCheckoutPage();
-    const cartValue = this.merchantDetector.detectCartValue();
-    
-    console.log('Wisor: Checking recommendations...');
-    console.log('Wisor: Is checkout page:', isCheckout);
-    console.log('Wisor: Cart value:', cartValue);
-    console.log('Wisor: Should show recommendation:', this.merchantDetector.shouldShowRecommendation());
-    
-    // Show widget on any supported merchant page for testing
-    if (this.merchantDetector.currentMerchant) {
-      console.log('Wisor: Generating recommendation for merchant:', this.merchantDetector.currentMerchant.name);
+    try {
+      const isCheckout = this.merchantDetector.detectCheckoutPage();
+      const cartValue = this.merchantDetector.detectCartValue();
       
-      const recommendation = this.recommendationEngine.getRecommendationForMerchant(
-        this.merchantDetector.currentMerchant,
-        cartValue || 1000 // Use 1000 as default for testing
-      );
+      console.log('Wisor: Checking...', {checkout: isCheckout, cart: cartValue});
       
-      console.log('Wisor: Generated recommendation:', recommendation);
-      
-      if (recommendation && recommendation.userCardRecommendations.length > 0) {
-        console.log('Wisor: Showing widget with recommendation');
-        this.showWidget(recommendation);
-      } else {
-        console.log('Wisor: No valid recommendations found');
+      // Show widget on any supported merchant page for testing
+      if (this.merchantDetector.currentMerchant) {
+        const recommendation = this.recommendationEngine.getRecommendationForMerchant(
+          this.merchantDetector.currentMerchant,
+          cartValue || 1000
+        );
+        
+        if (recommendation && recommendation.userCardRecommendations.length > 0) {
+          console.log('Wisor: Showing widget');
+          this.showWidget(recommendation);
+        }
       }
-    } else {
-      this.hideWidget();
+    } catch (error) {
+      console.log('Wisor: Error:', error.message);
     }
   }
 
@@ -219,28 +212,13 @@ class WisorContentScript {
   }
 }
 
-// Initialize when page loads
-console.log('Wisor: Content script loaded, document ready state:', document.readyState);
-
-function initializeWisor() {
-  console.log('Wisor: Initializing extension...');
-  const wisorScript = new WisorContentScript();
-  wisorScript.init();
-}
-
-if (document.readyState === 'loading') {
-  console.log('Wisor: Waiting for DOMContentLoaded...');
-  document.addEventListener('DOMContentLoaded', initializeWisor);
-} else {
-  console.log('Wisor: Document already ready, initializing immediately...');
-  initializeWisor();
-}
-
-// Also try initializing after window load as fallback
-window.addEventListener('load', () => {
-  console.log('Wisor: Window loaded, trying to initialize again...');
-  if (!window.wisorInitialized) {
-    window.wisorInitialized = true;
-    initializeWisor();
+// Initialize when page loads - simplified to avoid crashes
+setTimeout(() => {
+  try {
+    console.log('Wisor: Starting...');
+    const wisorScript = new WisorContentScript();
+    wisorScript.init();
+  } catch (error) {
+    console.log('Wisor: Init error:', error.message);
   }
-});
+}, 3000); // Wait 3 seconds to let page load completely

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wisor - Credit Card Assistant</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="popup-container">
+    <!-- Header -->
+    <div class="popup-header">
+      <div class="logo">
+        <span class="logo-icon">💳</span>
+        <span class="logo-text">Wisor</span>
+      </div>
+      <div class="version">v1.0</div>
+    </div>
+
+    <!-- Status Section -->
+    <div class="status-section">
+      <div class="current-site">
+        <span class="site-icon">🌐</span>
+        <span class="site-name" id="current-site">Not detected</span>
+      </div>
+      <div class="detection-status" id="detection-status">
+        <span class="status-dot"></span>
+        <span>Ready to help</span>
+      </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="stats-section">
+      <div class="stat-card">
+        <div class="stat-value" id="monthly-savings">₹0</div>
+        <div class="stat-label">Monthly Savings</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="cards-count">0</div>
+        <div class="stat-label">Your Cards</div>
+      </div>
+    </div>
+
+    <!-- Card Management -->
+    <div class="cards-section">
+      <div class="section-header">
+        <span>Your Credit Cards</span>
+        <button class="add-card-btn" id="add-card-btn">+</button>
+      </div>
+      <div class="cards-list" id="cards-list">
+        <!-- Cards will be populated by JavaScript -->
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="actions-section">
+      <button class="action-btn primary" id="optimize-btn">
+        <span class="btn-icon">🎯</span>
+        <span>Optimize Current Site</span>
+      </button>
+      <button class="action-btn secondary" id="settings-btn">
+        <span class="btn-icon">⚙️</span>
+        <span>Settings</span>
+      </button>
+    </div>
+
+    <!-- Footer -->
+    <div class="popup-footer">
+      <div class="footer-links">
+        <a href="#" id="help-link">Help</a>
+        <a href="#" id="feedback-link">Feedback</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="credit-cards-data.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>

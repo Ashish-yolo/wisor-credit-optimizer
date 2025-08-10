@@ -73,13 +73,13 @@
             </p>
             
             <div class="flex flex-col sm:flex-row gap-4 justify-center mb-16">
-                <button id="download-extension-btn" class="bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white font-medium px-12 py-4 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 text-lg">
+                <button onclick="downloadExtension()" class="bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white font-medium px-12 py-4 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 text-lg">
                     <span class="inline-flex items-center">
                         <span class="mr-3">🧩</span>
                         Download Chrome Extension
                     </span>
                 </button>
-                <button id="installation-guide-btn" class="bg-white/80 hover:bg-white text-slate-700 hover:text-slate-900 border border-slate-200 hover:border-slate-300 font-medium px-8 py-4 rounded-xl transition-all duration-200 shadow-md hover:shadow-lg backdrop-blur-sm">
+                <button onclick="openInstallationGuide()" class="bg-white/80 hover:bg-white text-slate-700 hover:text-slate-900 border border-slate-200 hover:border-slate-300 font-medium px-8 py-4 rounded-xl transition-all duration-200 shadow-md hover:shadow-lg backdrop-blur-sm">
                     <span class="inline-flex items-center">
                         <span class="mr-2">📋</span>
                         Installation Guide
@@ -227,7 +227,7 @@
             </div>
 
             <div class="flex justify-center">
-                <button id="download-extension-btn-2" class="bg-white text-slate-900 hover:bg-gray-100 font-medium px-8 py-4 rounded-xl transition-colors duration-200 shadow-lg inline-flex items-center justify-center">
+                <button onclick="downloadExtension()" class="bg-white text-slate-900 hover:bg-gray-100 font-medium px-8 py-4 rounded-xl transition-colors duration-200 shadow-lg inline-flex items-center justify-center">
                     <svg class="mr-2 w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
                     </svg>
@@ -256,65 +256,27 @@
     </footer>
 
     <script>
-        // Define functions globally first
-        function handleExtensionDownload() {
-            console.log('Download button clicked'); // Debug
-            // Create download link for the extension ZIP
+        // Simple direct approach - functions available immediately
+        function downloadExtension() {
+            alert('Download started!'); // Debug
             const link = document.createElement('a');
             link.href = 'wisor-extension-v1.0.zip';
             link.download = 'wisor-extension-v1.0.zip';
+            document.body.appendChild(link);
             link.click();
+            document.body.removeChild(link);
             
-            // Show detailed installation guide
             setTimeout(() => {
-                showInstallationGuide();
+                openInstallationGuide();
             }, 500);
         }
         
-        // Make it globally accessible
-        window.handleExtensionDownload = handleExtensionDownload;
+        function openInstallationGuide() {
+            alert('Opening installation guide!'); // Debug
+            showModal();
+        }
 
-        // Extension functionality
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('DOM loaded'); // Debug
-            
-            // Add event listeners to all buttons
-            const downloadExtensionBtn1 = document.getElementById('download-extension-btn');
-            const downloadExtensionBtn2 = document.getElementById('download-extension-btn-2');
-            const installationGuideBtn = document.getElementById('installation-guide-btn');
-            
-            console.log('Button 1:', downloadExtensionBtn1); // Debug
-            console.log('Button 2:', downloadExtensionBtn2); // Debug
-            console.log('Installation Guide Button:', installationGuideBtn); // Debug
-            
-            if (downloadExtensionBtn1) {
-                downloadExtensionBtn1.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    handleExtensionDownload();
-                });
-                console.log('Button 1 listener added'); // Debug
-            }
-            
-            if (downloadExtensionBtn2) {
-                downloadExtensionBtn2.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    handleExtensionDownload();
-                });
-                console.log('Button 2 listener added'); // Debug
-            }
-            
-            if (installationGuideBtn) {
-                installationGuideBtn.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    showInstallationGuide();
-                });
-                console.log('Installation guide button listener added'); // Debug
-            }
-        });
-
-        // Installation Guide Modal - Define globally
-        function showInstallationGuide() {
-            console.log('Installation guide opened'); // Debug
+        function showModal() {
             const modal = document.createElement('div');
             modal.id = 'installation-modal';
             modal.style.cssText = `
@@ -358,7 +320,7 @@
                             <h2 style="margin: 0; font-size: 24px; font-weight: bold;">🎉 Wisor Extension Downloaded!</h2>
                             <p style="margin: 8px 0 0 0; opacity: 0.9;">Follow these simple steps to install</p>
                         </div>
-                        <button id="close-modal-btn" style="
+                        <button onclick="closeModal()" style="
                             background: rgba(255, 255, 255, 0.2);
                             border: none;
                             color: white;
@@ -565,27 +527,14 @@
             \`;
 
             document.body.appendChild(modal);
-            
-            // Add event listener for close button
-            const closeBtn = document.getElementById('close-modal-btn');
-            if (closeBtn) {
-                closeBtn.addEventListener('click', closeInstallationGuide);
-            }
         }
         
-        // Make it globally accessible
-        window.showInstallationGuide = showInstallationGuide;
-
-        function closeInstallationGuide() {
-            console.log('Closing installation guide'); // Debug
+        function closeModal() {
             const modal = document.getElementById('installation-modal');
             if (modal) {
                 modal.remove();
             }
         }
-        
-        // Make it globally accessible
-        window.closeInstallationGuide = closeInstallationGuide;
     </script>
 </body>
 </html>

@@ -72,11 +72,17 @@
                 Smart recommendations for every purchase. Maximize your credit card rewards effortlessly.
             </p>
             
-            <div class="flex justify-center mb-16">
+            <div class="flex flex-col sm:flex-row gap-4 justify-center mb-16">
                 <button id="download-extension-btn" class="bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white font-medium px-12 py-4 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 text-lg">
                     <span class="inline-flex items-center">
                         <span class="mr-3">🧩</span>
                         Download Chrome Extension
+                    </span>
+                </button>
+                <button onclick="showInstallationGuide()" class="bg-white/80 hover:bg-white text-slate-700 hover:text-slate-900 border border-slate-200 hover:border-slate-300 font-medium px-8 py-4 rounded-xl transition-all duration-200 shadow-md hover:shadow-lg backdrop-blur-sm">
+                    <span class="inline-flex items-center">
+                        <span class="mr-2">📋</span>
+                        Installation Guide
                     </span>
                 </button>
             </div>
@@ -260,10 +266,10 @@
                 link.download = 'wisor-extension-v1.0.zip';
                 link.click();
                 
-                // Show installation instructions
+                // Show detailed installation guide
                 setTimeout(() => {
-                    alert('📥 Extension downloaded!\n\nInstallation steps:\n1. Unzip the downloaded file\n2. Open Chrome → chrome://extensions/\n3. Enable "Developer mode"\n4. Click "Load unpacked" and select the folder\n5. Pin Wisor extension to toolbar\n\nThen visit Amazon, Flipkart, or Zomato to see it in action! 🚀');
-                }, 1000);
+                    showInstallationGuide();
+                }, 500);
             }
 
             // Add event listeners to both download buttons
@@ -278,6 +284,267 @@
                 downloadExtensionBtn2.addEventListener('click', handleExtensionDownload);
             }
         });
+
+        // Installation Guide Modal
+        function showInstallationGuide() {
+            const modal = document.createElement('div');
+            modal.id = 'installation-modal';
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.8);
+                z-index: 10000;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 20px;
+                box-sizing: border-box;
+            `;
+
+            modal.innerHTML = \`
+                <div style="
+                    background: white;
+                    border-radius: 16px;
+                    max-width: 800px;
+                    width: 100%;
+                    max-height: 90vh;
+                    overflow-y: auto;
+                    position: relative;
+                    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+                ">
+                    <div style="
+                        position: sticky;
+                        top: 0;
+                        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                        color: white;
+                        padding: 20px;
+                        border-radius: 16px 16px 0 0;
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                    ">
+                        <div>
+                            <h2 style="margin: 0; font-size: 24px; font-weight: bold;">🎉 Wisor Extension Downloaded!</h2>
+                            <p style="margin: 8px 0 0 0; opacity: 0.9;">Follow these simple steps to install</p>
+                        </div>
+                        <button onclick="closeInstallationGuide()" style="
+                            background: rgba(255, 255, 255, 0.2);
+                            border: none;
+                            color: white;
+                            font-size: 24px;
+                            width: 40px;
+                            height: 40px;
+                            border-radius: 50%;
+                            cursor: pointer;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                        ">×</button>
+                    </div>
+                    
+                    <div style="padding: 30px;">
+                        <!-- Step 1 -->
+                        <div style="margin-bottom: 30px; border: 2px solid #e5e7eb; border-radius: 12px; padding: 20px;">
+                            <div style="display: flex; align-items: center; margin-bottom: 15px;">
+                                <div style="
+                                    background: #3b82f6;
+                                    color: white;
+                                    width: 30px;
+                                    height: 30px;
+                                    border-radius: 50%;
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: center;
+                                    font-weight: bold;
+                                    margin-right: 12px;
+                                ">1</div>
+                                <h3 style="margin: 0; font-size: 18px; color: #1f2937;">Unzip the Downloaded File</h3>
+                            </div>
+                            <div style="color: #4b5563; line-height: 1.6;">
+                                <p style="margin: 0 0 10px 0;">📁 Find <strong>wisor-extension-v1.0.zip</strong> in your Downloads folder</p>
+                                <p style="margin: 0 0 10px 0;">🗂️ Right-click the file and select <strong>"Extract All"</strong> or <strong>"Unzip"</strong></p>
+                                <p style="margin: 0; background: #f3f4f6; padding: 10px; border-radius: 6px; font-size: 14px;">
+                                    💡 This will create a folder called <strong>wisor-extension</strong>
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Step 2 -->
+                        <div style="margin-bottom: 30px; border: 2px solid #e5e7eb; border-radius: 12px; padding: 20px;">
+                            <div style="display: flex; align-items: center; margin-bottom: 15px;">
+                                <div style="
+                                    background: #3b82f6;
+                                    color: white;
+                                    width: 30px;
+                                    height: 30px;
+                                    border-radius: 50%;
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: center;
+                                    font-weight: bold;
+                                    margin-right: 12px;
+                                ">2</div>
+                                <h3 style="margin: 0; font-size: 18px; color: #1f2937;">Open Chrome Extensions</h3>
+                            </div>
+                            <div style="color: #4b5563; line-height: 1.6;">
+                                <p style="margin: 0 0 10px 0;">🌐 Open Google Chrome</p>
+                                <p style="margin: 0 0 10px 0;">📋 Copy and paste this in the address bar: <span style="background: #f3f4f6; padding: 4px 8px; border-radius: 4px; font-family: monospace;">chrome://extensions/</span></p>
+                                <p style="margin: 0; background: #dbeafe; padding: 10px; border-radius: 6px; font-size: 14px;">
+                                    ⚡ Or click the three dots → More Tools → Extensions
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Step 3 -->
+                        <div style="margin-bottom: 30px; border: 2px solid #e5e7eb; border-radius: 12px; padding: 20px;">
+                            <div style="display: flex; align-items: center; margin-bottom: 15px;">
+                                <div style="
+                                    background: #3b82f6;
+                                    color: white;
+                                    width: 30px;
+                                    height: 30px;
+                                    border-radius: 50%;
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: center;
+                                    font-weight: bold;
+                                    margin-right: 12px;
+                                ">3</div>
+                                <h3 style="margin: 0; font-size: 18px; color: #1f2937;">Enable Developer Mode</h3>
+                            </div>
+                            <div style="color: #4b5563; line-height: 1.6;">
+                                <p style="margin: 0 0 10px 0;">🔧 Look for the <strong>"Developer mode"</strong> toggle in the top-right corner</p>
+                                <p style="margin: 0 0 10px 0;">✅ Click to turn it <strong>ON</strong> (it will turn blue)</p>
+                                <p style="margin: 0; background: #fef3c7; padding: 10px; border-radius: 6px; font-size: 14px;">
+                                    ⚠️ Don't worry - this is safe and only for installing the extension
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Step 4 -->
+                        <div style="margin-bottom: 30px; border: 2px solid #e5e7eb; border-radius: 12px; padding: 20px;">
+                            <div style="display: flex; align-items: center; margin-bottom: 15px;">
+                                <div style="
+                                    background: #3b82f6;
+                                    color: white;
+                                    width: 30px;
+                                    height: 30px;
+                                    border-radius: 50%;
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: center;
+                                    font-weight: bold;
+                                    margin-right: 12px;
+                                ">4</div>
+                                <h3 style="margin: 0; font-size: 18px; color: #1f2937;">Install Wisor Extension</h3>
+                            </div>
+                            <div style="color: #4b5563; line-height: 1.6;">
+                                <p style="margin: 0 0 10px 0;">📦 Click <strong>"Load unpacked"</strong> button (appears after enabling developer mode)</p>
+                                <p style="margin: 0 0 10px 0;">📁 Select the <strong>wisor-extension</strong> folder you unzipped</p>
+                                <p style="margin: 0; background: #d1fae5; padding: 10px; border-radius: 6px; font-size: 14px;">
+                                    🎉 Wisor should now appear in your extensions list!
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Step 5 -->
+                        <div style="margin-bottom: 30px; border: 2px solid #e5e7eb; border-radius: 12px; padding: 20px;">
+                            <div style="display: flex; align-items: center; margin-bottom: 15px;">
+                                <div style="
+                                    background: #3b82f6;
+                                    color: white;
+                                    width: 30px;
+                                    height: 30px;
+                                    border-radius: 50%;
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: center;
+                                    font-weight: bold;
+                                    margin-right: 12px;
+                                ">5</div>
+                                <h3 style="margin: 0; font-size: 18px; color: #1f2937;">Pin to Toolbar</h3>
+                            </div>
+                            <div style="color: #4b5563; line-height: 1.6;">
+                                <p style="margin: 0 0 10px 0;">🧩 Click the puzzle piece icon in Chrome toolbar</p>
+                                <p style="margin: 0 0 10px 0;">📌 Find "Wisor - Smart Credit Card Assistant" and click the pin icon</p>
+                                <p style="margin: 0; background: #f0f9ff; padding: 10px; border-radius: 6px; font-size: 14px;">
+                                    ✨ Now Wisor will be visible in your toolbar!
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Success Section -->
+                        <div style="
+                            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+                            color: white;
+                            padding: 25px;
+                            border-radius: 12px;
+                            text-align: center;
+                            margin-bottom: 20px;
+                        ">
+                            <div style="font-size: 40px; margin-bottom: 10px;">🎉</div>
+                            <h3 style="margin: 0 0 10px 0; font-size: 20px;">Ready to Save Money!</h3>
+                            <p style="margin: 0; opacity: 0.9;">Visit Amazon, Flipkart, or Zomato and start getting smart credit card recommendations</p>
+                        </div>
+
+                        <!-- Test Sites -->
+                        <div style="text-align: center;">
+                            <h3 style="color: #1f2937; margin-bottom: 15px;">🧪 Test Wisor on these sites:</h3>
+                            <div style="display: flex; justify-content: center; gap: 15px; flex-wrap: wrap;">
+                                <a href="https://amazon.in" target="_blank" style="
+                                    background: #ff9900;
+                                    color: white;
+                                    padding: 8px 16px;
+                                    border-radius: 6px;
+                                    text-decoration: none;
+                                    font-size: 14px;
+                                    font-weight: 500;
+                                ">Amazon</a>
+                                <a href="https://flipkart.com" target="_blank" style="
+                                    background: #2874f0;
+                                    color: white;
+                                    padding: 8px 16px;
+                                    border-radius: 6px;
+                                    text-decoration: none;
+                                    font-size: 14px;
+                                    font-weight: 500;
+                                ">Flipkart</a>
+                                <a href="https://zomato.com" target="_blank" style="
+                                    background: #e23744;
+                                    color: white;
+                                    padding: 8px 16px;
+                                    border-radius: 6px;
+                                    text-decoration: none;
+                                    font-size: 14px;
+                                    font-weight: 500;
+                                ">Zomato</a>
+                                <a href="https://swiggy.com" target="_blank" style="
+                                    background: #fc8019;
+                                    color: white;
+                                    padding: 8px 16px;
+                                    border-radius: 6px;
+                                    text-decoration: none;
+                                    font-size: 14px;
+                                    font-weight: 500;
+                                ">Swiggy</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            \`;
+
+            document.body.appendChild(modal);
+        }
+
+        function closeInstallationGuide() {
+            const modal = document.getElementById('installation-modal');
+            if (modal) {
+                modal.remove();
+            }
+        }
     </script>
 </body>
 </html>

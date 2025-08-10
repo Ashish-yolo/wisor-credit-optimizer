@@ -1,6 +1,6 @@
 [build]
   publish = "dist"
-  command = "mkdir -p dist && cp public/index.html dist/ && cp assets/favicon.png dist/ && cp public/_redirects dist/"
+  command = "echo 'Using pre-built dist files'"
 
 [[redirects]]
   from = "/*"

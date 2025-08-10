@@ -14,7 +14,7 @@ const INDIAN_CREDIT_CARDS = {
     merchants: ['amazon', 'flipkart', 'myntra', 'zomato', 'swiggy'],
     color: '#1e40af',
     image: 'hdfc-millennia.png',
-    applyUrl: 'https://www.hdfcbank.com/personal/pay/cards/credit-cards/millennia-credit-card'
+    applyUrl: 'https://www.hdfcbank.com/personal/pay/cards/millennia-cards/millennia-cc-new'
   },
   
   'hdfc-regalia': {

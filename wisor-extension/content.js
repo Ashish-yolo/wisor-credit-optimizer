@@ -64,8 +64,8 @@ class WisorContentScript {
       
       console.log('Wisor: Checking...', {checkout: isCheckout, cart: cartValue, userCards: USER_CARDS.length});
       
-      // Show widget on any supported merchant page
-      if (this.merchantDetector.currentMerchant) {
+      // Only show widget on checkout/cart pages, not product pages
+      if (this.merchantDetector.currentMerchant && (isCheckout || cartValue > 0)) {
         // Update recommendation engine with latest cards
         this.recommendationEngine.userCards = USER_CARDS;
         

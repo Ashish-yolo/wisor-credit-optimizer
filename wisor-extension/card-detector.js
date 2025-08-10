@@ -9,26 +9,40 @@ class CardDetector {
     const detectedCards = [];
     
     try {
-      // Amazon payment methods selector
-      const paymentMethods = document.querySelectorAll(
-        '.a-radio[name="ppw-instrumentRowSelection"], .pmts-instrument-container, [data-testid="payment-method"]'
-      );
+      // More comprehensive Amazon payment selectors
+      const paymentSelectors = [
+        '.a-radio[name="ppw-instrumentRowSelection"]',
+        '.pmts-instrument-container',
+        '[data-testid="payment-method"]',
+        '.pmts-credit-card',
+        '.pmts-instrument-details',
+        '.a-fixed-left-grid-col.a-col-right .a-row',
+        '.payment-row',
+        '.pmts-portal-component',
+        '.a-section[data-pmts-component-id]'
+      ];
       
-      paymentMethods.forEach(method => {
-        const cardInfo = this.extractCardInfo(method);
-        if (cardInfo) {
-          detectedCards.push(cardInfo);
-        }
+      paymentSelectors.forEach(selector => {
+        const elements = document.querySelectorAll(selector);
+        elements.forEach(element => {
+          const cardInfo = this.extractCardInfo(element);
+          if (cardInfo && !detectedCards.includes(cardInfo)) {
+            detectedCards.push(cardInfo);
+          }
+        });
       });
 
-      // Also check saved payment methods
-      const savedCards = document.querySelectorAll('.pmts-credit-card, .pmts-instrument-details');
-      savedCards.forEach(card => {
-        const cardInfo = this.extractCardInfo(card);
-        if (cardInfo) {
-          detectedCards.push(cardInfo);
+      // Debug output
+      if (detectedCards.length > 0) {
+        console.log('Wisor: Found cards on page:', detectedCards);
+      } else {
+        console.log('Wisor: No cards detected - checking page content...');
+        // Check if we're on the right page
+        const pageText = document.body.textContent.toLowerCase();
+        if (pageText.includes('payment method') || pageText.includes('credit card')) {
+          console.log('Wisor: Payment page detected but no cards found');
         }
-      });
+      }
 
     } catch (error) {
       console.log('Wisor: Card detection error:', error.message);

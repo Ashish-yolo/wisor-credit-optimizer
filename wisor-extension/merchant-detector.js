@@ -54,16 +54,30 @@ class MerchantDetector {
         case 'amazon.in':
           this.isCheckoutPage = this.isCheckoutPage || 
             pathname.includes('/gp/buy') || 
-            pathname.includes('/ap/signin') && url.includes('openid.return_to');
+            pathname.includes('/gp/cart') ||
+            pathname.includes('/ap/signin') && url.includes('openid.return_to') ||
+            document.querySelector('#sc-active-cart') !== null ||
+            document.querySelector('.a-button-buybox') !== null;
           break;
         case 'flipkart.com':
           this.isCheckoutPage = this.isCheckoutPage || 
-            pathname.includes('/checkout');
+            pathname.includes('/checkout') ||
+            document.querySelector('[data-testid="cart"]') !== null;
           break;
         case 'zomato.com':
           this.isCheckoutPage = this.isCheckoutPage || 
             pathname.includes('/payment') ||
-            document.querySelector('.payment-container') !== null;
+            pathname.includes('/checkout') ||
+            document.querySelector('.payment-container') !== null ||
+            document.querySelector('[data-cy="checkout"]') !== null ||
+            document.querySelector('.cart-container') !== null ||
+            url.includes('checkout') ||
+            document.body.textContent.includes('Place Order');
+          break;
+        case 'swiggy.com':
+          this.isCheckoutPage = this.isCheckoutPage ||
+            pathname.includes('/checkout') ||
+            url.includes('checkout');
           break;
       }
     }

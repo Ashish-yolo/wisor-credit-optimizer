@@ -11,6 +11,7 @@ class WisorContentScript {
     if (this.isInitialized) return;
     
     console.log('Wisor: Initializing on', window.location.hostname);
+    console.log('Wisor: URL:', window.location.href);
     
     // Detect current merchant
     const merchant = this.merchantDetector.detectCurrentMerchant();
@@ -18,6 +19,8 @@ class WisorContentScript {
     if (merchant) {
       console.log('Wisor: Detected merchant:', merchant);
       this.startMonitoring();
+    } else {
+      console.log('Wisor: No merchant detected for:', window.location.hostname);
     }
     
     this.isInitialized = true;
@@ -52,14 +55,27 @@ class WisorContentScript {
     const isCheckout = this.merchantDetector.detectCheckoutPage();
     const cartValue = this.merchantDetector.detectCartValue();
     
-    if (this.merchantDetector.shouldShowRecommendation()) {
+    console.log('Wisor: Checking recommendations...');
+    console.log('Wisor: Is checkout page:', isCheckout);
+    console.log('Wisor: Cart value:', cartValue);
+    console.log('Wisor: Should show recommendation:', this.merchantDetector.shouldShowRecommendation());
+    
+    // Show widget on any supported merchant page for testing
+    if (this.merchantDetector.currentMerchant) {
+      console.log('Wisor: Generating recommendation for merchant:', this.merchantDetector.currentMerchant.name);
+      
       const recommendation = this.recommendationEngine.getRecommendationForMerchant(
         this.merchantDetector.currentMerchant,
-        cartValue
+        cartValue || 1000 // Use 1000 as default for testing
       );
       
+      console.log('Wisor: Generated recommendation:', recommendation);
+      
       if (recommendation && recommendation.userCardRecommendations.length > 0) {
+        console.log('Wisor: Showing widget with recommendation');
         this.showWidget(recommendation);
+      } else {
+        console.log('Wisor: No valid recommendations found');
       }
     } else {
       this.hideWidget();
@@ -204,12 +220,27 @@ class WisorContentScript {
 }
 
 // Initialize when page loads
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => {
-    const wisorScript = new WisorContentScript();
-    wisorScript.init();
-  });
-} else {
+console.log('Wisor: Content script loaded, document ready state:', document.readyState);
+
+function initializeWisor() {
+  console.log('Wisor: Initializing extension...');
   const wisorScript = new WisorContentScript();
   wisorScript.init();
 }
+
+if (document.readyState === 'loading') {
+  console.log('Wisor: Waiting for DOMContentLoaded...');
+  document.addEventListener('DOMContentLoaded', initializeWisor);
+} else {
+  console.log('Wisor: Document already ready, initializing immediately...');
+  initializeWisor();
+}
+
+// Also try initializing after window load as fallback
+window.addEventListener('load', () => {
+  console.log('Wisor: Window loaded, trying to initialize again...');
+  if (!window.wisorInitialized) {
+    window.wisorInitialized = true;
+    initializeWisor();
+  }
+});

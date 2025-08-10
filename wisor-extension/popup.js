@@ -34,15 +34,33 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
 
-    // Load user data
+    // Load user data from storage
     loadUserData();
     
-    // Populate cards list
-    populateCardsList();
+    // Load cards from storage and populate
+    loadUserCards(() => {
+      populateCardsList();
+    });
+  }
+
+  function loadUserCards(callback) {
+    // Try to load from chrome storage first
+    if (chrome && chrome.storage) {
+      chrome.storage.sync.get(['userCards'], (result) => {
+        if (result.userCards && result.userCards.length > 0) {
+          // Update global USER_CARDS with stored cards
+          USER_CARDS.length = 0;
+          result.userCards.forEach(cardId => USER_CARDS.push(cardId));
+        }
+        callback();
+      });
+    } else {
+      callback();
+    }
   }
 
   function loadUserData() {
-    // Simulate loading user data (in real app, this would come from chrome.storage)
+    // Load user stats
     setTimeout(() => {
       monthlySavingsElement.textContent = '₹2,847';
       cardsCountElement.textContent = USER_CARDS.length.toString();

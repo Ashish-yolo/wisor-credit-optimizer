@@ -3,6 +3,7 @@ class WisorContentScript {
   constructor() {
     this.merchantDetector = new MerchantDetector();
     this.recommendationEngine = new RecommendationEngine();
+    this.cardDetector = new CardDetector();
     this.widget = null;
     this.isInitialized = false;
   }
@@ -53,13 +54,21 @@ class WisorContentScript {
 
   checkAndShowRecommendation() {
     try {
+      // First, try to detect and sync cards from payment page
+      if (this.merchantDetector.currentMerchant?.hostname === 'amazon.in') {
+        this.cardDetector.syncDetectedCards();
+      }
+      
       const isCheckout = this.merchantDetector.detectCheckoutPage();
       const cartValue = this.merchantDetector.detectCartValue();
       
-      console.log('Wisor: Checking...', {checkout: isCheckout, cart: cartValue});
+      console.log('Wisor: Checking...', {checkout: isCheckout, cart: cartValue, userCards: USER_CARDS.length});
       
-      // Show widget on any supported merchant page for testing
+      // Show widget on any supported merchant page
       if (this.merchantDetector.currentMerchant) {
+        // Update recommendation engine with latest cards
+        this.recommendationEngine.userCards = USER_CARDS;
+        
         const recommendation = this.recommendationEngine.getRecommendationForMerchant(
           this.merchantDetector.currentMerchant,
           cartValue || 1000
@@ -141,7 +150,7 @@ class WisorContentScript {
           <button class="wisor-btn-secondary" onclick="document.getElementById('wisor-widget').style.display='none'">
             Maybe Later
           </button>
-          <button class="wisor-btn-primary" onclick="window.open('https://wisor.app/cards', '_blank')">
+          <button class="wisor-btn-primary" onclick="window.open('${bestRecommendation.card.applyUrl || 'https://bankbazaar.com'}', '_blank')">
             Get This Card
           </button>
         </div>

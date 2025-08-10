@@ -13,7 +13,8 @@ const INDIAN_CREDIT_CARDS = {
     },
     merchants: ['amazon', 'flipkart', 'myntra', 'zomato', 'swiggy'],
     color: '#1e40af',
-    image: 'hdfc-millennia.png'
+    image: 'hdfc-millennia.png',
+    applyUrl: 'https://www.hdfcbank.com/personal/pay/cards/credit-cards/millennia-credit-card'
   },
   
   'hdfc-regalia': {
@@ -29,7 +30,8 @@ const INDIAN_CREDIT_CARDS = {
     },
     merchants: ['makemytrip', 'goibibo', 'zomato', 'swiggy'],
     color: '#0f172a',
-    image: 'hdfc-regalia.png'
+    image: 'hdfc-regalia.png',
+    applyUrl: 'https://www.hdfcbank.com/personal/pay/cards/credit-cards/regalia-credit-card'
   },
 
   // SBI Cards
@@ -45,7 +47,8 @@ const INDIAN_CREDIT_CARDS = {
     },
     merchants: ['amazon', 'flipkart', 'myntra', 'bigbasket'],
     color: '#059669',
-    image: 'sbi-simplyclick.png'
+    image: 'sbi-simplyclick.png',
+    applyUrl: 'https://www.sbicard.com/en/personal/credit-cards/shopping/simplyclick-advantage-credit-card.page'
   },
 
   'sbi-prime': {
@@ -61,7 +64,8 @@ const INDIAN_CREDIT_CARDS = {
     },
     merchants: ['bookmyshow', 'bigbasket', 'zomato', 'swiggy'],
     color: '#7c2d12',
-    image: 'sbi-prime.png'
+    image: 'sbi-prime.png',
+    applyUrl: 'https://www.sbicard.com/en/personal/credit-cards/rewards/sbi-card-prime.page'
   },
 
   // ICICI Bank Cards
@@ -77,7 +81,8 @@ const INDIAN_CREDIT_CARDS = {
     },
     merchants: ['amazon'],
     color: '#ff9900',
-    image: 'icici-amazon.png'
+    image: 'icici-amazon.png',
+    applyUrl: 'https://www.icicibank.com/personal-banking/cards/credit-card/amazon-pay-icici-bank-credit-card'
   },
 
   'icici-platinum': {
@@ -91,7 +96,8 @@ const INDIAN_CREDIT_CARDS = {
     },
     merchants: ['general'],
     color: '#6366f1',
-    image: 'icici-platinum.png'
+    image: 'icici-platinum.png',
+    applyUrl: 'https://www.icicibank.com/personal-banking/cards/credit-card/platinum-chip-credit-card'
   },
 
   // Axis Bank Cards
@@ -107,7 +113,8 @@ const INDIAN_CREDIT_CARDS = {
     },
     merchants: ['flipkart', 'myntra'],
     color: '#f59e0b',
-    image: 'axis-flipkart.png'
+    image: 'axis-flipkart.png',
+    applyUrl: 'https://www.axisbank.com/retail/cards/credit-card/flipkart-axis-bank-credit-card'
   },
 
   'axis-ace': {
@@ -122,7 +129,8 @@ const INDIAN_CREDIT_CARDS = {
     },
     merchants: ['swiggy', 'zomato'],
     color: '#dc2626',
-    image: 'axis-ace.png'
+    image: 'axis-ace.png',
+    applyUrl: 'https://www.axisbank.com/retail/cards/credit-card/ace-credit-card'
   },
 
   // Kotak Mahindra Bank Cards
@@ -138,7 +146,8 @@ const INDIAN_CREDIT_CARDS = {
     },
     merchants: ['general'],
     color: '#8b5cf6',
-    image: 'kotak-league.png'
+    image: 'kotak-league.png',
+    applyUrl: 'https://www.kotak.com/en/personal-banking/cards/credit-cards/league-platinum-credit-card.html'
   },
 
   // American Express Cards
@@ -155,7 +164,8 @@ const INDIAN_CREDIT_CARDS = {
     },
     merchants: ['makemytrip', 'goibibo', 'zomato', 'swiggy'],
     color: '#d4af37',
-    image: 'amex-gold.png'
+    image: 'amex-gold.png',
+    applyUrl: 'https://www.americanexpress.com/in/credit-cards/gold-charge-card/'
   }
 };
 

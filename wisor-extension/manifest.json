@@ -1,18 +1,12 @@
 {
   "manifest_version": 3,
   "name": "Wisor - Smart Credit Card Assistant",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Get instant credit card recommendations while shopping online. Maximize your rewards effortlessly.",
   
   "permissions": [
     "activeTab",
-    "storage",
-    "tabs"
-  ],
-  
-  "host_permissions": [
-    "https://*/*",
-    "http://*/*"
+    "storage"
   ],
   
   "content_scripts": [
@@ -30,18 +24,13 @@
         "https://www.reliancedigital.in/*",
         "https://www.croma.com/*",
         "https://www.nykaa.com/*",
-        "https://www.ajio.com/*",
-        "https://paytm.com/*",
-        "https://www.phonepe.com/*"
+        "https://www.ajio.com/*"
       ],
       "js": ["credit-cards-data.js", "merchant-detector.js", "recommendation-engine.js", "content.js"],
-      "css": ["wisor-overlay.css"]
+      "css": ["wisor-overlay.css"],
+      "run_at": "document_end"
     }
   ],
-  
-  "background": {
-    "service_worker": "background.js"
-  },
   
   "action": {
     "default_popup": "popup.html",

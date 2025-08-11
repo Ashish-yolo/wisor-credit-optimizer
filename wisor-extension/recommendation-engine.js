@@ -3,7 +3,7 @@ class RecommendationEngine {
   constructor() {
     this.userCards = USER_CARDS;
     // Production backend URL - will fallback to local if needed
-    this.backendUrl = 'https://wisor-backend.onrender.com';
+    this.backendUrl = 'https://wisor-credit-optimizer.onrender.com';
     this.fallbackToLocal = true;
   }
 

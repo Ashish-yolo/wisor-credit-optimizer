@@ -54,6 +54,9 @@ class WisorContentScript {
 
   async checkAndShowRecommendation() {
     try {
+      console.log('Wisor: Starting check on URL:', window.location.href);
+      console.log('Wisor: Current merchant detected:', this.merchantDetector.currentMerchant);
+      
       // First, try to detect and sync cards from payment page
       if (this.merchantDetector.currentMerchant?.hostname === 'amazon.in') {
         this.cardDetector.syncDetectedCards();
@@ -62,10 +65,22 @@ class WisorContentScript {
       const isCheckout = this.merchantDetector.detectCheckoutPage();
       const cartValue = this.merchantDetector.detectCartValue();
       
-      console.log('Wisor: Checking...', {checkout: isCheckout, cart: cartValue, userCards: USER_CARDS.length});
+      console.log('Wisor: Detection results:', {
+        merchant: this.merchantDetector.currentMerchant?.name || 'None detected',
+        hostname: this.merchantDetector.currentMerchant?.hostname || 'Unknown',
+        checkout: isCheckout, 
+        cart: cartValue, 
+        userCards: USER_CARDS.length,
+        url: window.location.href
+      });
       
-      // Show widget on checkout pages or when cart value is detected
-      if (this.merchantDetector.currentMerchant && (isCheckout || cartValue > 0)) {
+      // Show widget on checkout pages, cart pages, or supported sites
+      const shouldShow = this.merchantDetector.currentMerchant && 
+                        (isCheckout || cartValue > 0 || this.isLikelySupportedPage());
+      
+      console.log('Wisor: Should show widget?', shouldShow);
+      
+      if (shouldShow) {
         // Update recommendation engine with latest cards
         this.recommendationEngine.userCards = USER_CARDS;
         
@@ -96,7 +111,20 @@ class WisorContentScript {
           this.hideWidget();
         }
       } else {
-        console.log('Wisor: Not a checkout/cart page, skipping');
+        console.log('Wisor: Not showing widget. Reasons:', {
+          noMerchant: !this.merchantDetector.currentMerchant,
+          notCheckout: !isCheckout,
+          noCartValue: cartValue === 0,
+          notSupportedPage: !this.isLikelySupportedPage()
+        });
+        
+        // Show demo widget on any supported shopping site for testing
+        if (window.location.hostname.includes('amazon') || 
+            window.location.hostname.includes('flipkart') ||
+            window.location.hostname.includes('zomato')) {
+          console.log('Wisor: Showing demo widget for testing');
+          this.showDemoWidget();
+        }
       }
     } catch (error) {
       console.log('Wisor: Error:', error.message);
@@ -283,6 +311,37 @@ class WisorContentScript {
     if (this.widget) {
       this.widget.style.display = 'none';
     }
+  }
+
+  isLikelySupportedPage() {
+    const url = window.location.href.toLowerCase();
+    const pathname = window.location.pathname.toLowerCase();
+    
+    // Check for common shopping/checkout indicators
+    const indicators = [
+      'cart', 'checkout', 'buy', 'order', 'payment', 'billing',
+      'product', 'item', 'shop', 'store', 'add-to-cart'
+    ];
+    
+    return indicators.some(indicator => 
+      url.includes(indicator) || pathname.includes(indicator)
+    );
+  }
+
+  showDemoWidget() {
+    // Show a demo widget with sample recommendations for testing
+    const demoRecommendation = {
+      userCardRecommendations: [{
+        card: { name: 'HDFC Millennia', bank: 'HDFC' },
+        value: 50,
+        description: 'Demo: 5% cashback on online shopping',
+        source: 'demo'
+      }],
+      aiPowered: true,
+      merchant: { name: window.location.hostname }
+    };
+    
+    this.showWidget(demoRecommendation);
   }
 }
 

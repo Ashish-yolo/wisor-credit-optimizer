@@ -86,117 +86,74 @@ class MerchantDetector {
   }
 
   detectCartValue() {
+    console.log('Wisor: Starting cart value detection...');
     let cartValue = 0;
     
     try {
-      // Amazon cart detection - expanded selectors
-      if (this.currentMerchant?.hostname === 'amazon.in') {
-        const priceSelectors = [
-          '#sc-subtotal-amount-activecart .a-price-whole',
-          '#sc-subtotal-amount-buybox .a-price-whole',
-          '.a-price-whole',
-          '[data-cy="price-recipe"] .a-price-whole',
-          '.sw-subtotal-details-total .a-price-whole',
-          '.grand-total-price .a-price-whole'
-        ];
-        
-        for (const selector of priceSelectors) {
-          const element = document.querySelector(selector);
-          if (element) {
-            const price = parseFloat(element.textContent.replace(/[₹,]/g, ''));
-            if (price > 0) {
+      // Universal price detection - scan ALL text on page for price patterns
+      const allText = document.body.innerText || document.body.textContent;
+      const priceMatches = allText.match(/₹[\d,]+(?:\.\d{2})?/g);
+      
+      if (priceMatches) {
+        console.log('Wisor: Found price patterns:', priceMatches.slice(0, 10));
+        // Get the highest reasonable price (likely to be total)
+        const prices = priceMatches
+          .map(match => parseFloat(match.replace(/[₹,]/g, '')))
+          .filter(price => price > 50 && price < 100000) // Reasonable range
+          .sort((a, b) => b - a); // Highest first
+          
+        if (prices.length > 0) {
+          cartValue = prices[0];
+          console.log('Wisor: Selected highest reasonable price:', cartValue);
+        }
+      }
+      
+      // Also try specific selectors for common patterns
+      const commonSelectors = [
+        // Generic price patterns
+        '*[class*="total"]', '*[class*="price"]', '*[class*="amount"]',
+        '*[id*="total"]', '*[id*="price"]', '*[id*="amount"]',
+        // Common checkout patterns
+        '.checkout-total', '.order-total', '.cart-total', '.grand-total',
+        '.final-total', '.payable-amount', '.bill-amount',
+        // Data attributes
+        '[data-testid*="total"]', '[data-testid*="price"]',
+        '[data-cy*="total"]', '[data-cy*="price"]'
+      ];
+      
+      for (const selector of commonSelectors) {
+        const elements = document.querySelectorAll(selector);
+        for (const element of elements) {
+          const text = element.textContent || element.innerText;
+          const match = text.match(/₹[\d,]+(?:\.\d{2})?/);
+          if (match) {
+            const price = parseFloat(match[0].replace(/[₹,]/g, ''));
+            if (price > cartValue && price > 50 && price < 100000) {
               cartValue = price;
-              break;
+              console.log(`Wisor: Found better price ${price} in ${selector}:`, text.trim());
             }
           }
         }
       }
       
-      // Flipkart cart detection - expanded
-      else if (this.currentMerchant?.hostname === 'flipkart.com') {
-        const priceSelectors = [
-          '._1f22mC', 
-          '.ZP7ysC',
-          '._2-ut7d',
-          '._1dqRvU',
-          '[data-testid="total-payable"]'
-        ];
-        
-        for (const selector of priceSelectors) {
-          const element = document.querySelector(selector);
-          if (element) {
-            const price = parseFloat(element.textContent.replace(/[₹,]/g, ''));
-            if (price > 0) {
-              cartValue = price;
-              break;
-            }
-          }
-        }
-      }
-      
-      // Zomato order value - expanded
-      else if (this.currentMerchant?.hostname === 'zomato.com') {
-        const priceSelectors = [
-          '.total-price', 
-          '[data-cy="total-bill"]',
-          '.bill-total',
-          '.grand-total',
-          '.order-total'
-        ];
-        
-        for (const selector of priceSelectors) {
-          const element = document.querySelector(selector);
-          if (element) {
-            const price = parseFloat(element.textContent.replace(/[₹,]/g, ''));
-            if (price > 0) {
-              cartValue = price;
-              break;
-            }
-          }
-        }
-      }
-      
-      // Generic detection for all sites
+      // Default fallback for any shopping page
       if (cartValue === 0) {
-        const priceSelectors = [
-          '.total-price',
-          '.cart-total', 
-          '.order-total',
-          '.grand-total',
-          '.bill-total',
-          '[data-testid="total"]',
-          '[data-testid="cart-total"]',
-          '.total',
-          '.price-total',
-          '.checkout-total',
-          '.payment-total',
-          '.subtotal'
-        ];
-        
-        for (const selector of priceSelectors) {
-          const elements = document.querySelectorAll(selector);
-          for (const element of elements) {
-            const text = element.textContent || element.innerText;
-            const price = parseFloat(text.replace(/[₹,]/g, ''));
-            if (price > 0) {
-              cartValue = price;
-              break;
-            }
-          }
-          if (cartValue > 0) break;
+        const url = window.location.href.toLowerCase();
+        if (url.includes('amazon') || url.includes('flipkart') || 
+            url.includes('zomato') || url.includes('swiggy') ||
+            url.includes('cart') || url.includes('checkout') ||
+            url.includes('buy') || url.includes('order')) {
+          cartValue = 1500; // Default for shopping pages
+          console.log('Wisor: Using default value for shopping page');
         }
-      }
-      
-      // If still no cart value found, use default for checkout pages
-      if (cartValue === 0 && this.isCheckoutPage) {
-        cartValue = 1000; // Default value for checkout pages
-        console.log('Wisor: Using default cart value for checkout page');
       }
       
     } catch (error) {
       console.log('Wisor: Error detecting cart value:', error);
+      cartValue = 1500; // Safe default
     }
     
+    console.log('Wisor: Final detected cart value:', cartValue);
     return cartValue;
   }
 

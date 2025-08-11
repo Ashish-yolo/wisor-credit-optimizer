@@ -74,41 +74,44 @@ class WisorContentScript {
         url: window.location.href
       });
       
-      // Show widget on checkout pages, cart pages, or supported sites
-      const shouldShow = this.merchantDetector.currentMerchant && 
-                        (isCheckout || cartValue > 0 || this.isLikelySupportedPage());
+      // Show widget if we found any price or on any shopping site
+      const shouldShow = cartValue > 0 || window.location.hostname.includes('amazon') || 
+                        window.location.hostname.includes('flipkart') || 
+                        window.location.hostname.includes('zomato');
       
-      console.log('Wisor: Should show widget?', shouldShow);
+      console.log('Wisor: Should show widget?', shouldShow, {cartValue, hostname: window.location.hostname});
       
       if (shouldShow) {
         // Update recommendation engine with latest cards
         this.recommendationEngine.userCards = USER_CARDS;
         
-        // Use detected cart value or default to 1000 for checkout pages
-        const finalCartValue = cartValue > 0 ? cartValue : (isCheckout ? 1000 : 0);
+        // Use detected cart value or reasonable default
+        const finalCartValue = cartValue > 0 ? cartValue : 1500;
         
-        if (finalCartValue > 0) {
-          console.log(`Wisor: Processing ${isCheckout ? 'checkout' : 'cart'} page with value ₹${finalCartValue}`);
-          
-          // Show loading state first
-          this.showLoadingWidget();
-          
-          // Get recommendation (now async with Claude integration)
-          const recommendation = await this.recommendationEngine.getRecommendationForMerchant(
-            this.merchantDetector.currentMerchant,
-            finalCartValue
-          );
-          
-          if (recommendation && recommendation.userCardRecommendations.length > 0) {
-            console.log('Wisor: Showing widget', recommendation.aiPowered ? '(AI-powered)' : '(local)');
-            this.showWidget(recommendation);
-          } else {
-            console.log('Wisor: No recommendations found');
-            this.hideWidget();
-          }
+        console.log(`Wisor: Processing shopping page with value ₹${finalCartValue}`);
+        
+        // Show loading state first
+        this.showLoadingWidget();
+        
+        // Create simple merchant object
+        const merchant = this.merchantDetector.currentMerchant || {
+          name: window.location.hostname,
+          hostname: window.location.hostname,
+          category: 'shopping'
+        };
+        
+        // Get recommendation (now async with Claude integration)
+        const recommendation = await this.recommendationEngine.getRecommendationForMerchant(
+          merchant,
+          finalCartValue
+        );
+        
+        if (recommendation && recommendation.userCardRecommendations.length > 0) {
+          console.log('Wisor: Showing widget', recommendation.aiPowered ? '(AI-powered)' : '(local)');
+          this.showWidget(recommendation);
         } else {
-          console.log('Wisor: No cart value detected, skipping');
-          this.hideWidget();
+          console.log('Wisor: No recommendations found, showing demo');
+          this.showDemoWidget();
         }
       } else {
         console.log('Wisor: Not showing widget. Reasons:', {

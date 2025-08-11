@@ -9,6 +9,12 @@
     "storage"
   ],
   
+  "host_permissions": [
+    "http://localhost:3001/*",
+    "https://wisor-backend.onrender.com/*",
+    "https://api.wisor.app/*"
+  ],
+  
   "content_scripts": [
     {
       "matches": [

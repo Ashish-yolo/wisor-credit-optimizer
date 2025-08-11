@@ -52,7 +52,7 @@ class WisorContentScript {
     });
   }
 
-  checkAndShowRecommendation() {
+  async checkAndShowRecommendation() {
     try {
       // First, try to detect and sync cards from payment page
       if (this.merchantDetector.currentMerchant?.hostname === 'amazon.in') {
@@ -69,19 +69,70 @@ class WisorContentScript {
         // Update recommendation engine with latest cards
         this.recommendationEngine.userCards = USER_CARDS;
         
-        const recommendation = this.recommendationEngine.getRecommendationForMerchant(
+        // Show loading state first
+        this.showLoadingWidget();
+        
+        // Get recommendation (now async with Claude integration)
+        const recommendation = await this.recommendationEngine.getRecommendationForMerchant(
           this.merchantDetector.currentMerchant,
           cartValue || 1000
         );
         
         if (recommendation && recommendation.userCardRecommendations.length > 0) {
-          console.log('Wisor: Showing widget');
+          console.log('Wisor: Showing widget', recommendation.aiPowered ? '(AI-powered)' : '(local)');
           this.showWidget(recommendation);
+        } else {
+          this.hideWidget();
         }
       }
     } catch (error) {
       console.log('Wisor: Error:', error.message);
+      this.hideWidget();
     }
+  }
+
+  showLoadingWidget() {
+    if (this.widget) {
+      // Update existing widget to show loading
+      const content = this.widget.querySelector('.wisor-content');
+      if (content) {
+        content.innerHTML = `
+          <div class="wisor-loading" style="text-align: center; padding: 20px;">
+            <div style="font-size: 24px; margin-bottom: 10px;">🤖</div>
+            <div>Getting AI recommendations...</div>
+          </div>
+        `;
+      }
+      return;
+    }
+
+    // Create loading widget
+    this.widget = document.createElement('div');
+    this.widget.id = 'wisor-widget';
+    this.widget.className = 'wisor-widget';
+    
+    this.widget.innerHTML = `
+      <div class="wisor-header">
+        <div class="wisor-logo">
+          <span class="wisor-icon">💳</span>
+          <span class="wisor-title">Wisor AI</span>
+        </div>
+        <button class="wisor-close" onclick="this.parentElement.parentElement.style.display='none'">×</button>
+      </div>
+      <div class="wisor-content">
+        <div class="wisor-loading" style="text-align: center; padding: 20px;">
+          <div style="font-size: 24px; margin-bottom: 10px;">🤖</div>
+          <div>Getting AI recommendations...</div>
+        </div>
+      </div>
+    `;
+    
+    this.positionWidget();
+    document.body.appendChild(this.widget);
+    
+    setTimeout(() => {
+      this.widget.classList.add('wisor-show');
+    }, 100);
   }
 
   showWidget(recommendation) {
@@ -105,8 +156,8 @@ class WisorContentScript {
     this.widget.innerHTML = `
       <div class="wisor-header">
         <div class="wisor-logo">
-          <span class="wisor-icon">💳</span>
-          <span class="wisor-title">Wisor</span>
+          <span class="wisor-icon">${recommendation.aiPowered ? '🤖' : '💳'}</span>
+          <span class="wisor-title">Wisor ${recommendation.aiPowered ? 'AI' : ''}</span>
         </div>
         <button class="wisor-close" onclick="this.parentElement.parentElement.style.display='none'">×</button>
       </div>

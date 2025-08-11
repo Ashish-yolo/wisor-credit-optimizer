@@ -1,11 +1,124 @@
-// Credit Card Recommendation Engine
+// Credit Card Recommendation Engine with Claude AI Integration
 class RecommendationEngine {
   constructor() {
     this.userCards = USER_CARDS;
+    // Production backend URL - will fallback to local if needed
+    this.backendUrl = 'https://wisor-backend.onrender.com';
+    this.fallbackToLocal = true;
   }
 
-  getRecommendationForMerchant(merchant, cartValue = 0) {
+  async getRecommendationForMerchant(merchant, cartValue = 0) {
     if (!merchant) return null;
+
+    try {
+      // Try Claude-powered recommendation first
+      const claudeRecommendation = await this.getClaudeRecommendation(merchant, cartValue);
+      if (claudeRecommendation) {
+        return claudeRecommendation;
+      }
+    } catch (error) {
+      console.log('Wisor: Claude API unavailable, using local recommendations');
+    }
+
+    // Fallback to local logic
+    return this.getLocalRecommendation(merchant, cartValue);
+  }
+
+  async getClaudeRecommendation(merchant, cartValue) {
+    if (this.userCards.length === 0) {
+      return null;
+    }
+
+    const requestBody = {
+      merchant: merchant.name || merchant.hostname,
+      category: merchant.category || 'general',
+      amount: cartValue || 1000,
+      userCards: this.userCards,
+      context: {
+        url: merchant.url || window.location.href,
+        timestamp: new Date().toISOString(),
+        userPreferences: this.getUserPreferences()
+      }
+    };
+
+    try {
+      const response = await fetch(`${this.backendUrl}/api/recommend`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestBody)
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      
+      if (data.success && data.recommendation) {
+        return this.formatClaudeRecommendation(data.recommendation, merchant, cartValue);
+      }
+    } catch (error) {
+      console.error('Wisor: Claude API error:', error);
+      throw error;
+    }
+
+    return null;
+  }
+
+  formatClaudeRecommendation(claudeRec, merchant, cartValue) {
+    const recommendedCard = INDIAN_CREDIT_CARDS[claudeRec.recommendedCard];
+    const alternativeCard = claudeRec.alternative ? INDIAN_CREDIT_CARDS[claudeRec.alternative.card] : null;
+
+    const userCardRecommendations = [];
+
+    if (recommendedCard) {
+      userCardRecommendations.push({
+        card: recommendedCard,
+        value: claudeRec.rewardValue || 0,
+        description: claudeRec.reasoning || 'AI-optimized recommendation',
+        rate: 0,
+        type: 'ai-recommendation',
+        cartValue: cartValue,
+        source: 'claude'
+      });
+    }
+
+    // Add alternative if available
+    if (alternativeCard && claudeRec.alternative) {
+      userCardRecommendations.push({
+        card: alternativeCard,
+        value: claudeRec.alternative.rewardValue || 0,
+        description: claudeRec.alternative.reason || 'Alternative option',
+        rate: 0,
+        type: 'ai-alternative',
+        cartValue: cartValue,
+        source: 'claude'
+      });
+    }
+
+    return {
+      userCardRecommendations: userCardRecommendations,
+      suggestedCards: this.getSuggestedCards(merchant, cartValue).slice(0, 3),
+      merchant: merchant,
+      cartValue: cartValue,
+      aiPowered: true,
+      reasoning: claudeRec.reasoning
+    };
+  }
+
+  getUserPreferences() {
+    // This could be enhanced to store user preferences
+    return {
+      prefersCashback: true,
+      spendingPattern: 'frequent online shopping',
+      riskTolerance: 'conservative'
+    };
+  }
+
+  // Fallback to original local logic  
+  getLocalRecommendation(merchant, cartValue = 0) {
     
     const recommendations = [];
     

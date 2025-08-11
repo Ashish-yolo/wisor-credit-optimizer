@@ -113,7 +113,7 @@ class WisorContentScript {
           <div class="wisor-loading" style="text-align: center; padding: 20px;">
             <div style="font-size: 24px; margin-bottom: 10px;">🤖</div>
             <div>Getting AI recommendations...</div>
-            <div style="font-size: 12px; opacity: 0.7; margin-top: 8px;">This may take a few seconds</div>
+            <div style="font-size: 12px; opacity: 0.7; margin-top: 8px;">Claude is analyzing your cards (10-30s)</div>
           </div>
         `;
       }

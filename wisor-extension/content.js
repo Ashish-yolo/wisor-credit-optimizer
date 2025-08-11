@@ -101,16 +101,19 @@ class WisorContentScript {
         };
         
         // Get recommendation (now async with Claude integration)
+        console.log('Wisor: Calling recommendation engine...', {merchant, finalCartValue});
         const recommendation = await this.recommendationEngine.getRecommendationForMerchant(
           merchant,
           finalCartValue
         );
         
-        if (recommendation && recommendation.userCardRecommendations.length > 0) {
-          console.log('Wisor: Showing widget', recommendation.aiPowered ? '(AI-powered)' : '(local)');
+        console.log('Wisor: Got recommendation result:', recommendation);
+        
+        if (recommendation && recommendation.userCardRecommendations && recommendation.userCardRecommendations.length > 0) {
+          console.log('Wisor: Showing widget with', recommendation.userCardRecommendations.length, 'recommendations');
           this.showWidget(recommendation);
         } else {
-          console.log('Wisor: No recommendations found, showing demo');
+          console.log('Wisor: No valid recommendations, showing demo widget');
           this.showDemoWidget();
         }
       } else {
@@ -268,12 +271,58 @@ class WisorContentScript {
   updateWidget(recommendation) {
     if (!this.widget) return;
     
-    const bestRecommendation = recommendation.userCardRecommendations[0];
+    console.log('Wisor: Updating widget with recommendation:', recommendation);
     
-    // Update benefit value
-    const valueElement = this.widget.querySelector('.wisor-benefit-value');
-    if (valueElement) {
-      valueElement.textContent = `₹${Math.round(bestRecommendation.value)}`;
+    const bestRecommendation = recommendation.userCardRecommendations[0];
+    const merchant = recommendation.merchant;
+    
+    // Replace the entire content with the actual recommendation
+    const content = this.widget.querySelector('.wisor-content');
+    if (content) {
+      content.innerHTML = `
+        <div class="wisor-merchant">
+          <span class="wisor-merchant-icon">🏪</span>
+          <span>${merchant.name || 'Shopping Site'} detected</span>
+        </div>
+        
+        <div class="wisor-recommendation">
+          <div class="wisor-rec-header">💡 Smart Recommendation</div>
+          <div class="wisor-rec-card">
+            <div class="wisor-card-info">
+              <div class="wisor-card-name">${bestRecommendation.card.name}</div>
+              <div class="wisor-card-bank">${bestRecommendation.card.bank}</div>
+            </div>
+            <div class="wisor-benefit">
+              <div class="wisor-benefit-value">₹${Math.round(bestRecommendation.value)}</div>
+              <div class="wisor-benefit-desc">Potential reward</div>
+            </div>
+          </div>
+          <div class="wisor-benefit-details">
+            ${bestRecommendation.description}
+          </div>
+        </div>
+        
+        ${recommendation.userCardRecommendations.length > 1 ? `
+          <div class="wisor-alternatives">
+            <div class="wisor-alternatives-title">Other options:</div>
+            ${recommendation.userCardRecommendations.slice(1, 3).map(rec => `
+              <div class="wisor-alt-card">
+                <span class="wisor-alt-name">${rec.card.name}</span>
+                <span class="wisor-alt-value">₹${Math.round(rec.value)}</span>
+              </div>
+            `).join('')}
+          </div>
+        ` : ''}
+        
+        <div class="wisor-actions">
+          <button class="wisor-btn-secondary" onclick="document.getElementById('wisor-widget').style.display='none'">
+            Maybe Later
+          </button>
+          <button class="wisor-btn-primary" onclick="window.open('${bestRecommendation.card.applyUrl || 'https://bankbazaar.com'}', '_blank')">
+            ${recommendation.userCardRecommendations.some(r => r.source === 'demo') ? 'Learn More' : 'Get This Card'}
+          </button>
+        </div>
+      `;
     }
   }
 
@@ -332,18 +381,37 @@ class WisorContentScript {
   }
 
   showDemoWidget() {
+    console.log('Wisor: Creating demo widget...');
+    
     // Show a demo widget with sample recommendations for testing
     const demoRecommendation = {
       userCardRecommendations: [{
-        card: { name: 'HDFC Millennia', bank: 'HDFC' },
+        card: { 
+          name: 'HDFC Millennia', 
+          bank: 'HDFC',
+          applyUrl: 'https://bankbazaar.com'
+        },
+        value: 75,
+        description: 'Demo: 5% cashback on online shopping (up to ₹1000/month)',
+        source: 'demo',
+        cartValue: 1500
+      }, {
+        card: { 
+          name: 'SBI SimplyCLICK', 
+          bank: 'SBI',
+          applyUrl: 'https://bankbazaar.com'
+        },
         value: 50,
-        description: 'Demo: 5% cashback on online shopping',
-        source: 'demo'
+        description: 'Demo: 5X rewards on online shopping',
+        source: 'demo',
+        cartValue: 1500
       }],
-      aiPowered: true,
-      merchant: { name: window.location.hostname }
+      aiPowered: false,
+      merchant: { name: window.location.hostname || 'Shopping Site' },
+      cartValue: 1500
     };
     
+    console.log('Wisor: Showing demo widget with recommendations:', demoRecommendation);
     this.showWidget(demoRecommendation);
   }
 }

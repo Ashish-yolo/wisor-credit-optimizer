@@ -24,16 +24,28 @@ app.use(limiter);
 
 // CORS configuration for Chrome extension
 app.use(cors({
-  origin: [
-    'chrome-extension://*',
-    'moz-extension://*',
-    'http://localhost:3000',
-    'https://wisor-credit-optimizer.netlify.app',
-    'https://wisor.app',
-    /^https:\/\/.*\.railway\.app$/,
-    /^https:\/\/.*\.render\.com$/
-  ],
-  credentials: true
+  origin: function (origin, callback) {
+    // Allow requests with no origin (mobile apps, curl, etc.)
+    if (!origin) return callback(null, true);
+    
+    // Allow Chrome extensions
+    if (origin.startsWith('chrome-extension://') || 
+        origin.startsWith('moz-extension://') ||
+        origin === 'https://wisor-credit-optimizer.netlify.app' ||
+        origin === 'https://wisor.app' ||
+        origin.includes('railway.app') ||
+        origin.includes('render.com') ||
+        origin === 'http://localhost:3000') {
+      return callback(null, true);
+    }
+    
+    // Allow all Chrome extensions for now
+    return callback(null, true);
+  },
+  credentials: true,
+  optionsSuccessStatus: 200,
+  methods: ['GET', 'POST', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 }));
 
 app.use(express.json({ limit: '10mb' }));
@@ -141,9 +153,12 @@ Response format:
 
   } catch (error) {
     console.error('Error in /api/recommend:', error);
+    console.error('Request body:', req.body);
+    console.error('Error stack:', error.stack);
     res.status(500).json({ 
       error: 'Internal server error',
-      message: process.env.NODE_ENV === 'development' ? error.message : 'Something went wrong'
+      message: error.message,
+      timestamp: new Date().toISOString()
     });
   }
 });

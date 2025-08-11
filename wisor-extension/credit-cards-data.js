@@ -82,7 +82,7 @@ const INDIAN_CREDIT_CARDS = {
     merchants: ['amazon'],
     color: '#ff9900',
     image: 'icici-amazon.png',
-    applyUrl: 'https://www.icicibank.com/personal-banking/cards/credit-card/amazon-pay-icici-bank-credit-card'
+    applyUrl: 'https://www.icicibank.com/personal-banking/cards/credit-card/amazon-pay-credit-card'
   },
 
   'icici-platinum': {

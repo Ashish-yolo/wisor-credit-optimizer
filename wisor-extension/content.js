@@ -147,7 +147,7 @@ class WisorContentScript {
           <div class="wisor-loading" style="text-align: center; padding: 20px;">
             <div style="font-size: 24px; margin-bottom: 10px;">🤖</div>
             <div>Getting recommendations...</div>
-            <div style="font-size: 12px; opacity: 0.7; margin-top: 8px;">AI first, then local fallback (8s max)</div>
+            <div style="font-size: 12px; opacity: 0.7; margin-top: 8px;">Wisor is doing its magic...</div>
           </div>
         `;
       }

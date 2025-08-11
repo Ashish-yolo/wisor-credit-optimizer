@@ -42,13 +42,20 @@ class RecommendationEngine {
     };
 
     try {
+      // Set timeout for API call (10 seconds max)
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000);
+      
       const response = await fetch(`${this.backendUrl}/api/recommend`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(requestBody)
+        body: JSON.stringify(requestBody),
+        signal: controller.signal
       });
+      
+      clearTimeout(timeoutId);
 
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -61,6 +68,9 @@ class RecommendationEngine {
       }
     } catch (error) {
       console.error('Wisor: Claude API error:', error);
+      if (error.name === 'AbortError') {
+        console.log('Wisor: API request timed out, using fallback');
+      }
       throw error;
     }
 

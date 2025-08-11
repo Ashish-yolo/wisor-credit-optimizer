@@ -10,18 +10,37 @@ class RecommendationEngine {
   async getRecommendationForMerchant(merchant, cartValue = 0) {
     if (!merchant) return null;
 
-    try {
-      // Try Claude-powered recommendation first
-      const claudeRecommendation = await this.getClaudeRecommendation(merchant, cartValue);
-      if (claudeRecommendation) {
-        return claudeRecommendation;
-      }
-    } catch (error) {
-      console.log('Wisor: Claude API unavailable, using local recommendations');
-    }
+    console.log('Wisor: Starting recommendation process...');
 
-    // Fallback to local logic
-    return this.getLocalRecommendation(merchant, cartValue);
+    // Start both Claude and local recommendations in parallel
+    const claudePromise = this.getClaudeRecommendation(merchant, cartValue)
+      .catch(error => {
+        console.log('Wisor: Claude API failed:', error.message);
+        return null;
+      });
+    
+    const localPromise = new Promise(resolve => {
+      setTimeout(() => {
+        console.log('Wisor: 8 second timeout - showing local recommendations');
+        resolve(this.getLocalRecommendation(merchant, cartValue));
+      }, 8000); // Show local after 8 seconds
+    });
+
+    // Return whichever comes first
+    const result = await Promise.race([claudePromise, localPromise]);
+    
+    // If Claude responded, mark as AI-powered
+    if (result && !result.aiPowered) {
+      const claudeResult = await Promise.race([
+        claudePromise,
+        new Promise(resolve => setTimeout(() => resolve(null), 1000))
+      ]);
+      if (claudeResult) {
+        return claudeResult;
+      }
+    }
+    
+    return result;
   }
 
   async getClaudeRecommendation(merchant, cartValue) {
@@ -139,6 +158,7 @@ class RecommendationEngine {
 
   // Fallback to original local logic  
   getLocalRecommendation(merchant, cartValue = 0) {
+    console.log('Wisor: Generating local recommendations...');
     
     const recommendations = [];
     
@@ -153,17 +173,37 @@ class RecommendationEngine {
       }
     }
     
+    // If no specific benefits found, add generic recommendations
+    if (recommendations.length === 0 && this.userCards.length > 0) {
+      for (const cardId of this.userCards.slice(0, 2)) {
+        const card = INDIAN_CREDIT_CARDS[cardId];
+        if (card) {
+          recommendations.push({
+            card: card,
+            value: Math.round(cartValue * 0.01), // 1% default
+            rate: 1,
+            type: 'cashback',
+            description: 'General cashback reward',
+            cartValue: cartValue
+          });
+        }
+      }
+    }
+    
     // Sort by value (highest benefit first)
     recommendations.sort((a, b) => b.value - a.value);
     
     // Also include top 3 cards that would be good for this merchant (even if user doesn't have them)
     const suggestedCards = this.getSuggestedCards(merchant, cartValue);
     
+    console.log('Wisor: Local recommendations generated:', recommendations.length);
+    
     return {
       userCardRecommendations: recommendations,
       suggestedCards: suggestedCards.slice(0, 3),
       merchant: merchant,
-      cartValue: cartValue
+      cartValue: cartValue,
+      aiPowered: false
     };
   }
 

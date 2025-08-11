@@ -50,9 +50,13 @@ class RecommendationEngine {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Origin': chrome.runtime.getURL('')
         },
         body: JSON.stringify(requestBody),
-        signal: controller.signal
+        signal: controller.signal,
+        mode: 'cors',
+        credentials: 'omit'
       });
       
       clearTimeout(timeoutId);
@@ -68,6 +72,12 @@ class RecommendationEngine {
       }
     } catch (error) {
       console.error('Wisor: Claude API error:', error);
+      console.error('Wisor: Error details:', {
+        name: error.name,
+        message: error.message,
+        stack: error.stack,
+        url: `${this.backendUrl}/api/recommend`
+      });
       if (error.name === 'AbortError') {
         console.log('Wisor: API request timed out, using fallback');
       }

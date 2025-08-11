@@ -64,26 +64,39 @@ class WisorContentScript {
       
       console.log('Wisor: Checking...', {checkout: isCheckout, cart: cartValue, userCards: USER_CARDS.length});
       
-      // Only show widget on checkout/cart pages, not product pages
+      // Show widget on checkout pages or when cart value is detected
       if (this.merchantDetector.currentMerchant && (isCheckout || cartValue > 0)) {
         // Update recommendation engine with latest cards
         this.recommendationEngine.userCards = USER_CARDS;
         
-        // Show loading state first
-        this.showLoadingWidget();
+        // Use detected cart value or default to 1000 for checkout pages
+        const finalCartValue = cartValue > 0 ? cartValue : (isCheckout ? 1000 : 0);
         
-        // Get recommendation (now async with Claude integration)
-        const recommendation = await this.recommendationEngine.getRecommendationForMerchant(
-          this.merchantDetector.currentMerchant,
-          cartValue || 1000
-        );
-        
-        if (recommendation && recommendation.userCardRecommendations.length > 0) {
-          console.log('Wisor: Showing widget', recommendation.aiPowered ? '(AI-powered)' : '(local)');
-          this.showWidget(recommendation);
+        if (finalCartValue > 0) {
+          console.log(`Wisor: Processing ${isCheckout ? 'checkout' : 'cart'} page with value ₹${finalCartValue}`);
+          
+          // Show loading state first
+          this.showLoadingWidget();
+          
+          // Get recommendation (now async with Claude integration)
+          const recommendation = await this.recommendationEngine.getRecommendationForMerchant(
+            this.merchantDetector.currentMerchant,
+            finalCartValue
+          );
+          
+          if (recommendation && recommendation.userCardRecommendations.length > 0) {
+            console.log('Wisor: Showing widget', recommendation.aiPowered ? '(AI-powered)' : '(local)');
+            this.showWidget(recommendation);
+          } else {
+            console.log('Wisor: No recommendations found');
+            this.hideWidget();
+          }
         } else {
+          console.log('Wisor: No cart value detected, skipping');
           this.hideWidget();
         }
+      } else {
+        console.log('Wisor: Not a checkout/cart page, skipping');
       }
     } catch (error) {
       console.log('Wisor: Error:', error.message);

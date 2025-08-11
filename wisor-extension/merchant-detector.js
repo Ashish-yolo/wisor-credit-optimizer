@@ -89,39 +89,15 @@ class MerchantDetector {
     let cartValue = 0;
     
     try {
-      // Amazon cart detection
+      // Amazon cart detection - expanded selectors
       if (this.currentMerchant?.hostname === 'amazon.in') {
-        const priceElement = document.querySelector('#sc-subtotal-amount-activecart .a-price-whole, .a-price-whole');
-        if (priceElement) {
-          cartValue = parseFloat(priceElement.textContent.replace(/[₹,]/g, '')) || 0;
-        }
-      }
-      
-      // Flipkart cart detection
-      if (this.currentMerchant?.hostname === 'flipkart.com') {
-        const priceElement = document.querySelector('._1f22mC, .ZP7ysC');
-        if (priceElement) {
-          cartValue = parseFloat(priceElement.textContent.replace(/[₹,]/g, '')) || 0;
-        }
-      }
-      
-      // Zomato order value
-      if (this.currentMerchant?.hostname === 'zomato.com') {
-        const priceElement = document.querySelector('.total-price, [data-cy="total-bill"]');
-        if (priceElement) {
-          cartValue = parseFloat(priceElement.textContent.replace(/[₹,]/g, '')) || 0;
-        }
-      }
-      
-      // Generic detection for other sites
-      if (cartValue === 0) {
         const priceSelectors = [
-          '.total-price',
-          '.cart-total',
-          '.order-total',
-          '.grand-total',
-          '[data-testid="total"]',
-          '.total'
+          '#sc-subtotal-amount-activecart .a-price-whole',
+          '#sc-subtotal-amount-buybox .a-price-whole',
+          '.a-price-whole',
+          '[data-cy="price-recipe"] .a-price-whole',
+          '.sw-subtotal-details-total .a-price-whole',
+          '.grand-total-price .a-price-whole'
         ];
         
         for (const selector of priceSelectors) {
@@ -135,6 +111,88 @@ class MerchantDetector {
           }
         }
       }
+      
+      // Flipkart cart detection - expanded
+      else if (this.currentMerchant?.hostname === 'flipkart.com') {
+        const priceSelectors = [
+          '._1f22mC', 
+          '.ZP7ysC',
+          '._2-ut7d',
+          '._1dqRvU',
+          '[data-testid="total-payable"]'
+        ];
+        
+        for (const selector of priceSelectors) {
+          const element = document.querySelector(selector);
+          if (element) {
+            const price = parseFloat(element.textContent.replace(/[₹,]/g, ''));
+            if (price > 0) {
+              cartValue = price;
+              break;
+            }
+          }
+        }
+      }
+      
+      // Zomato order value - expanded
+      else if (this.currentMerchant?.hostname === 'zomato.com') {
+        const priceSelectors = [
+          '.total-price', 
+          '[data-cy="total-bill"]',
+          '.bill-total',
+          '.grand-total',
+          '.order-total'
+        ];
+        
+        for (const selector of priceSelectors) {
+          const element = document.querySelector(selector);
+          if (element) {
+            const price = parseFloat(element.textContent.replace(/[₹,]/g, ''));
+            if (price > 0) {
+              cartValue = price;
+              break;
+            }
+          }
+        }
+      }
+      
+      // Generic detection for all sites
+      if (cartValue === 0) {
+        const priceSelectors = [
+          '.total-price',
+          '.cart-total', 
+          '.order-total',
+          '.grand-total',
+          '.bill-total',
+          '[data-testid="total"]',
+          '[data-testid="cart-total"]',
+          '.total',
+          '.price-total',
+          '.checkout-total',
+          '.payment-total',
+          '.subtotal'
+        ];
+        
+        for (const selector of priceSelectors) {
+          const elements = document.querySelectorAll(selector);
+          for (const element of elements) {
+            const text = element.textContent || element.innerText;
+            const price = parseFloat(text.replace(/[₹,]/g, ''));
+            if (price > 0) {
+              cartValue = price;
+              break;
+            }
+          }
+          if (cartValue > 0) break;
+        }
+      }
+      
+      // If still no cart value found, use default for checkout pages
+      if (cartValue === 0 && this.isCheckoutPage) {
+        cartValue = 1000; // Default value for checkout pages
+        console.log('Wisor: Using default cart value for checkout page');
+      }
+      
     } catch (error) {
       console.log('Wisor: Error detecting cart value:', error);
     }

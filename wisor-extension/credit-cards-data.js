@@ -1,4 +1,4 @@
-// Comprehensive Indian Credit Cards Database
+// Enhanced Credit Cards Database with User Cards and Offers Support
 const INDIAN_CREDIT_CARDS = {
   // HDFC Bank Cards
   'hdfc-millennia': {
@@ -192,3 +192,184 @@ let USER_CARDS = [
   'sbi-simplyclick',
   'icici-amazon-pay'
 ];
+
+// Enhanced data structures for user-added cards and offers
+const USER_ADDED_CARDS = new Map(); // Stores custom cards added by users
+const DYNAMIC_OFFERS = new Map(); // Stores scraped offers with expiry dates
+const REWARD_RATE_CACHE = new Map(); // Caches scraped reward rates
+
+// Enhanced card data structure
+class EnhancedCreditCard {
+  constructor(cardData) {
+    this.id = cardData.id;
+    this.name = cardData.name;
+    this.bank = cardData.bank;
+    this.annualFee = cardData.annualFee;
+    this.benefits = cardData.benefits || {};
+    this.merchants = cardData.merchants || [];
+    this.color = cardData.color;
+    this.image = cardData.image;
+    this.applyUrl = cardData.applyUrl;
+    
+    // Enhanced fields
+    this.source = cardData.source || 'static'; // 'static' | 'user-added' | 'detected'
+    this.lastUpdated = cardData.lastUpdated || new Date().toISOString();
+    this.customRewards = cardData.customRewards || {}; // User-defined reward rates
+    this.isActive = cardData.isActive !== false;
+    this.userNotes = cardData.userNotes || '';
+    this.verification = cardData.verification || { status: 'unverified', date: null };
+  }
+
+  // Get effective benefits (combines static + custom + dynamic offers)
+  getEffectiveBenefits(merchant = null, date = new Date()) {
+    const benefits = { ...this.benefits, ...this.customRewards };
+    
+    // Add dynamic offers if applicable
+    if (merchant) {
+      const offers = this.getActiveOffers(merchant, date);
+      offers.forEach(offer => {
+        if (offer.category && (!benefits[offer.category] || offer.rate > benefits[offer.category].rate)) {
+          benefits[offer.category] = {
+            rate: offer.rate,
+            type: offer.type,
+            description: offer.description,
+            source: 'offer',
+            expires: offer.expires
+          };
+        }
+      });
+    }
+    
+    return benefits;
+  }
+
+  // Get active offers for this card
+  getActiveOffers(merchant = null, date = new Date()) {
+    const cardOffers = DYNAMIC_OFFERS.get(this.id) || [];
+    return cardOffers.filter(offer => {
+      const isActive = new Date(offer.expires) > date;
+      const matchesMerchant = !merchant || offer.merchants.includes(merchant) || offer.category === merchant.category;
+      return isActive && matchesMerchant;
+    });
+  }
+}
+
+// Offer data structure
+class DynamicOffer {
+  constructor(offerData) {
+    this.id = offerData.id || Date.now().toString();
+    this.cardId = offerData.cardId;
+    this.title = offerData.title;
+    this.description = offerData.description;
+    this.rate = offerData.rate; // Benefit rate (e.g., 5 for 5%)
+    this.type = offerData.type; // 'cashback' | 'points' | 'discount'
+    this.category = offerData.category; // 'dining' | 'shopping' etc.
+    this.merchants = offerData.merchants || []; // Specific merchants
+    this.minSpend = offerData.minSpend || 0;
+    this.maxBenefit = offerData.maxBenefit || null;
+    this.expires = offerData.expires;
+    this.source = offerData.source; // 'scraped' | 'bank-email' | 'manual'
+    this.sourceUrl = offerData.sourceUrl;
+    this.scraped = {
+      date: offerData.scraped?.date || new Date().toISOString(),
+      confidence: offerData.scraped?.confidence || 0.8
+    };
+  }
+
+  isValid(date = new Date()) {
+    return new Date(this.expires) > date;
+  }
+
+  matchesMerchant(merchant) {
+    if (this.merchants.includes(merchant.hostname)) return true;
+    if (this.category && this.category === merchant.category) return true;
+    return false;
+  }
+}
+
+// Bank configuration for reward scraping
+const BANK_SCRAPING_CONFIG = {
+  'hdfc': {
+    baseUrl: 'https://www.hdfcbank.com',
+    rewardPagesEndpoints: ['/personal/pay/cards/credit-cards', '/offers'],
+    selectors: {
+      offerCards: '.offer-card, .credit-card-offer',
+      title: '.offer-title, h3, h4',
+      description: '.offer-description, .card-benefits p',
+      validTill: '.validity, .expires, .valid-till'
+    },
+    rateLimit: 5000 // 5 seconds between requests
+  },
+  'sbi': {
+    baseUrl: 'https://www.sbicard.com',
+    rewardPagesEndpoints: ['/en/personal/credit-cards', '/en/offers'],
+    selectors: {
+      offerCards: '.offer-item, .card-offer',
+      title: '.title, h3',
+      description: '.description, .offer-text',
+      validTill: '.validity-date, .expire-date'
+    },
+    rateLimit: 5000
+  },
+  'icici': {
+    baseUrl: 'https://www.icicibank.com',
+    rewardPagesEndpoints: ['/personal-banking/cards/credit-card', '/offers'],
+    selectors: {
+      offerCards: '.offer-box, .credit-card-offer',
+      title: '.offer-heading, h4',
+      description: '.offer-details, .benefits',
+      validTill: '.expiry, .valid-date'
+    },
+    rateLimit: 5000
+  },
+  'axis': {
+    baseUrl: 'https://www.axisbank.com',
+    rewardPagesEndpoints: ['/retail/cards/credit-card', '/offers-and-deals'],
+    selectors: {
+      offerCards: '.offer-card, .axis-offer',
+      title: '.offer-title, h3',
+      description: '.offer-content, .card-benefit',
+      validTill: '.expiry-date, .validity'
+    },
+    rateLimit: 5000
+  }
+};
+
+// Merchant offer scraping configuration
+const MERCHANT_SCRAPING_CONFIG = {
+  'amazon': {
+    offerSelectors: [
+      '.s-coupon-highlight-color', // Coupon offers
+      '[data-testid="offer-display-text"]', // Card offers
+      '.promotions-coupon', // Promotions
+      '.a-color-success' // General offers
+    ],
+    cardOfferPatterns: [
+      /(\d+)%\s*(cashback|off).*?(hdfc|sbi|icici|axis)/i,
+      /save\s*₹(\d+).*?(hdfc|sbi|icici|axis)/i,
+      /extra\s*(\d+)%.*?credit\s*card/i
+    ]
+  },
+  'flipkart': {
+    offerSelectors: [
+      '._2ZdXDB', // Offer tags
+      '._3j4Zjq', // Bank offers
+      '._16FRp0' // Additional offers
+    ],
+    cardOfferPatterns: [
+      /(\d+)%\s*instant\s*discount.*?(axis|sbi|hdfc|icici)/i,
+      /₹(\d+)\s*off.*?credit\s*card/i
+    ]
+  },
+  'zomato': {
+    offerSelectors: [
+      '[data-testid="offer-card"]',
+      '.offer-item',
+      '.promo-tag'
+    ],
+    cardOfferPatterns: [
+      /(\d+)%\s*off.*?(hdfc|axis|sbi|icici)/i,
+      /up\s*to\s*₹(\d+).*?cashback/i
+    ]
+  }
+};

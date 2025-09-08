@@ -73,8 +73,12 @@ app.post('/api/recommend', async (req, res) => {
       });
     }
 
-    // Prepare context for Claude
-    const prompt = `You are Wisor, an expert credit card optimization assistant for Indian consumers. 
+    // Check if we should include offers (detect from context or merchant)
+    const includeOffers = context.includeOffers || 
+      ['amazon', 'flipkart', 'zomato', 'swiggy'].some(m => merchant.toLowerCase().includes(m));
+
+    // Prepare enhanced context for Claude
+    const prompt = `You are Wisor, an expert credit card optimization assistant for Indian consumers with real-time offer analysis.
 
 CONTEXT:
 - Merchant: ${merchant}
@@ -82,25 +86,34 @@ CONTEXT:
 - Purchase Amount: ₹${amount}
 - User's Credit Cards: ${userCards.join(', ')}
 - Additional Context: ${JSON.stringify(context)}
+- Current Date: ${new Date().toISOString().split('T')[0]}
 
-CREDIT CARDS DATABASE:
-${getCardDatabase()}
+ENHANCED CARDS DATABASE:
+${getEnhancedCardDatabase(includeOffers)}
+
+ANALYSIS PRIORITY:
+1. Check for ACTIVE OFFERS first (these override base rewards)
+2. Calculate combined value (base reward + offer bonus)
+3. Consider offer expiry dates (urgent if <7 days)
+4. Factor in caps and minimum spend requirements
 
 TASK:
-Analyze this purchase and recommend the BEST credit card from user's portfolio. Provide:
+Recommend the OPTIMAL credit card considering both base rewards and active offers:
 
-1. **Best Card Recommendation**: Which specific card to use
-2. **Reward Value**: Exact rupee amount they'll earn
-3. **Reasoning**: Why this card is optimal (2-3 sentences)
-4. **Alternative**: Second-best option if applicable
+1. **Best Card**: Card with highest total value (base + offers)
+2. **Total Reward Value**: Combined reward amount in ₹
+3. **Reasoning**: Explain calculation including any active offers
+4. **Urgency**: Flag if using time-sensitive offers
 
-Keep response concise, specific, and focused on maximizing rewards. Use Indian rupee formatting (₹).
+${includeOffers ? 'IMPORTANT: Include offer details and expiry information in your reasoning.' : ''}
 
 Response format:
 {
   "recommendedCard": "card-id",
-  "rewardValue": 125,
-  "reasoning": "Your detailed explanation here",
+  "rewardValue": 150,
+  "reasoning": "HDFC Millennia gives 5% base + 20% Zomato offer = total ₹150 savings. Offer expires in 6 days!",
+  "offerUsed": "20% off Zomato offer",
+  "urgency": "high|medium|low",
   "alternative": {
     "card": "alternative-card-id", 
     "rewardValue": 100,
@@ -205,9 +218,10 @@ Provide helpful, specific advice about credit cards, rewards optimization, and s
   }
 });
 
-// Function to get credit cards database for Claude context
-function getCardDatabase() {
-  return `
+// Enhanced context with dynamic offers
+function getEnhancedCardDatabase(includeOffers = false) {
+  let database = `
+CORE CARDS & REWARDS:
 HDFC MILLENNIA: 5% cashback on online shopping (₹1000 cap), 5% on dining (₹1000 cap), 1% on others
 HDFC REGALIA: 6 points/₹150 on dining/travel/fuel, 2 points/₹150 on others (1 point = ₹0.5)
 SBI SIMPLYCLICK: 5X points on online shopping (₹1000 cap), 1 point/₹100 on others
@@ -219,6 +233,30 @@ KOTAK LEAGUE: 4 points/₹150 on fuel/utilities, 1 point/₹150 on others
 AMEX GOLD: 4X points on travel/dining, 2X on fuel, 1X on others
 ICICI PLATINUM: 2 points/₹100, 1% fuel surcharge waiver
 `;
+
+  if (includeOffers) {
+    database += `
+
+ACTIVE OFFERS (Priority - Use These First):
+🔥 HDFC MILLENNIA: 20% off on Zomato (up to ₹100) - Expires Soon!
+🔥 SBI SIMPLYCLICK: 10% instant discount on Flipkart (up to ₹1500) - Valid till Oct 31
+🔥 ICICI AMAZON PAY: Extra 2% cashback during Prime events - Limited time
+⚡ HDFC Cards: Additional 5% cashback on Amazon purchases - Scraped offer
+
+OFFER ANALYSIS INSTRUCTIONS:
+- ALWAYS prioritize active offers over base rewards
+- Check expiry dates - flag offers expiring within 7 days
+- Combine base rewards + offer benefits for total value
+- Mention offer source (scraped/manual) for credibility
+`;
+  }
+
+  return database;
+}
+
+// Legacy function for backward compatibility
+function getCardDatabase() {
+  return getEnhancedCardDatabase(false);
 }
 
 // Error handling middleware

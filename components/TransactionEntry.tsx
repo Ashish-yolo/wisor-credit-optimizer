@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   View,
   Text,
@@ -8,6 +8,7 @@ import {
   StyleSheet,
   Alert,
   Modal,
+  ActivityIndicator,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import {
@@ -66,6 +67,12 @@ const TransactionEntryScreen = () => {
     notes: '',
   });
 
+  // Reactive recommendation state
+  const [realtimeRecommendation, setRealtimeRecommendation] = useState<any>(null);
+  const [isLoadingRecommendation, setIsLoadingRecommendation] = useState(false);
+  const [recommendationError, setRecommendationError] = useState<string | null>(null);
+  const recommendationEngineRef = useRef<any>(null);
+
   // Available cards
   const cards: Card[] = [
     { id: '1', name: 'HDFC Millennia', bank: 'HDFC Bank', lastFour: '4532', color: '#3B82F6' },
@@ -121,6 +128,71 @@ const TransactionEntryScreen = () => {
     { id: 'groceries', name: 'Groceries', icon: Home, color: '#06B6D4', bgColor: '#CFFAFE' },
     { id: 'entertainment', name: 'Entertainment', icon: Smartphone, color: '#F97316', bgColor: '#FED7AA' },
   ];
+
+  // Initialize recommendation engine
+  useEffect(() => {
+    // In a real app, this would import the RecommendationEngine class
+    // For now, we'll simulate it with a basic implementation
+    recommendationEngineRef.current = {
+      getReactiveRecommendation: async (merchant, cartValue) => {
+        return new Promise((resolve) => {
+          setTimeout(() => {
+            const recommendation = getOptimizationRecommendation(merchant, cartValue, transactionForm.category);
+            resolve({
+              userCardRecommendations: [{
+                card: { name: recommendation.card, id: recommendation.card.toLowerCase().replace(/ /g, '-') },
+                value: recommendation.savings,
+                description: recommendation.reason,
+                rate: Math.floor(recommendation.savings / cartValue * 100) || 1,
+                type: 'cashback'
+              }],
+              cartValue: cartValue,
+              aiPowered: false
+            });
+          }, 200 + Math.random() * 300); // Simulate network delay
+        });
+      }
+    };
+  }, []);
+
+  // Reactive recommendation calculation
+  const calculateRealtimeRecommendation = useCallback(async (merchant: string, amount: string) => {
+    if (!merchant || !amount || !recommendationEngineRef.current) {
+      setRealtimeRecommendation(null);
+      return;
+    }
+
+    const numericAmount = parseFloat(amount);
+    if (isNaN(numericAmount) || numericAmount <= 0) {
+      setRealtimeRecommendation(null);
+      return;
+    }
+
+    setIsLoadingRecommendation(true);
+    setRecommendationError(null);
+
+    try {
+      const recommendation = await recommendationEngineRef.current.getReactiveRecommendation(
+        merchant,
+        numericAmount
+      );
+      setRealtimeRecommendation(recommendation);
+    } catch (error) {
+      setRecommendationError('Failed to calculate recommendation');
+      console.error('Recommendation calculation error:', error);
+    } finally {
+      setIsLoadingRecommendation(false);
+    }
+  }, [transactionForm.category]);
+
+  // Debounced effect for amount/merchant changes
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      calculateRealtimeRecommendation(transactionForm.merchant, transactionForm.amount);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [transactionForm.merchant, transactionForm.amount, calculateRealtimeRecommendation]);
 
   const getCategoryInfo = (categoryId: string) => {
     return categories.find(cat => cat.id === categoryId) || categories[0];
@@ -292,6 +364,44 @@ const TransactionEntryScreen = () => {
           />
         </View>
       </View>
+
+      {/* Real-time Recommendation Display */}
+      {(realtimeRecommendation || isLoadingRecommendation || recommendationError) && (
+        <View style={styles.recommendationPreview}>
+          <Text style={styles.recommendationTitle}>💡 Smart Recommendation</Text>
+          
+          {isLoadingRecommendation ? (
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="small" color="#3B82F6" />
+              <Text style={styles.loadingText}>Calculating best rewards...</Text>
+            </View>
+          ) : recommendationError ? (
+            <View style={styles.errorContainer}>
+              <AlertTriangle size={16} color="#EF4444" />
+              <Text style={styles.errorText}>{recommendationError}</Text>
+            </View>
+          ) : realtimeRecommendation?.userCardRecommendations?.[0] ? (
+            <View style={styles.recommendationContent}>
+              <View style={styles.recommendationCard}>
+                <View style={styles.recommendationHeader}>
+                  <CreditCard size={20} color="#3B82F6" />
+                  <Text style={styles.recommendedCardName}>
+                    {realtimeRecommendation.userCardRecommendations[0].card.name}
+                  </Text>
+                  <View style={styles.rewardBadge}>
+                    <Text style={styles.rewardAmount}>
+                      ₹{realtimeRecommendation.userCardRecommendations[0].value}
+                    </Text>
+                  </View>
+                </View>
+                <Text style={styles.recommendationReason}>
+                  {realtimeRecommendation.userCardRecommendations[0].description}
+                </Text>
+              </View>
+            </View>
+          ) : null}
+        </View>
+      )}
 
       {/* Category Selection */}
       <View style={styles.inputGroup}>
@@ -829,6 +939,79 @@ const styles = StyleSheet.create({
     color: '#6B7280',
     fontSize: 16,
     fontWeight: '600',
+  },
+
+  // Real-time Recommendation Styles
+  recommendationPreview: {
+    backgroundColor: '#EFF6FF',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: '#BFDBFE',
+  },
+  recommendationTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#1E40AF',
+    marginBottom: 12,
+  },
+  loadingContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  loadingText: {
+    fontSize: 14,
+    color: '#6B7280',
+  },
+  errorContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  errorText: {
+    fontSize: 14,
+    color: '#EF4444',
+    flex: 1,
+  },
+  recommendationContent: {
+    gap: 8,
+  },
+  recommendationCard: {
+    backgroundColor: 'white',
+    borderRadius: 8,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+  },
+  recommendationHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+    gap: 8,
+  },
+  recommendedCardName: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1F2937',
+    flex: 1,
+  },
+  rewardBadge: {
+    backgroundColor: '#10B981',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 8,
+  },
+  rewardAmount: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: 'white',
+  },
+  recommendationReason: {
+    fontSize: 14,
+    color: '#6B7280',
+    lineHeight: 18,
   },
 });
 

@@ -5,6 +5,12 @@ class RecommendationEngine {
     // Production backend URL - will fallback to local if needed
     this.backendUrl = 'https://wisor-credit-optimizer.onrender.com';
     this.fallbackToLocal = true;
+    
+    // Reactive calculation setup
+    this.calculationCache = new Map();
+    this.calculationCallbacks = new Map();
+    this.debounceTimers = new Map();
+    this.isCalculating = false;
   }
 
   async getRecommendationForMerchant(merchant, cartValue = 0) {
@@ -295,5 +301,110 @@ class RecommendationEngine {
       .sort((a, b) => b.value - a.value);
     
     return alternatives[0] || null;
+  }
+
+  // Reactive calculation methods
+  subscribeToRewardUpdates(merchant, callback) {
+    const key = this.getMerchantKey(merchant);
+    if (!this.calculationCallbacks.has(key)) {
+      this.calculationCallbacks.set(key, new Set());
+    }
+    this.calculationCallbacks.get(key).add(callback);
+    
+    // Return unsubscribe function
+    return () => {
+      const callbacks = this.calculationCallbacks.get(key);
+      if (callbacks) {
+        callbacks.delete(callback);
+        if (callbacks.size === 0) {
+          this.calculationCallbacks.delete(key);
+        }
+      }
+    };
+  }
+
+  async getReactiveRecommendation(merchant, cartValue = 0, debounceMs = 300) {
+    const key = this.getMerchantKey(merchant) + '_' + cartValue;
+    
+    // Check cache first
+    if (this.calculationCache.has(key)) {
+      const cached = this.calculationCache.get(key);
+      if (Date.now() - cached.timestamp < 30000) { // 30 second cache
+        return cached.data;
+      }
+    }
+
+    // Clear existing debounce timer
+    if (this.debounceTimers.has(key)) {
+      clearTimeout(this.debounceTimers.get(key));
+    }
+
+    // Set loading state
+    this.isCalculating = true;
+    this.notifyCallbacks(merchant, { loading: true, cartValue });
+
+    return new Promise((resolve) => {
+      const timer = setTimeout(async () => {
+        try {
+          const result = await this.getRecommendationForMerchant(merchant, cartValue);
+          
+          // Cache the result
+          this.calculationCache.set(key, {
+            data: result,
+            timestamp: Date.now()
+          });
+          
+          // Clean up old cache entries (keep last 50)
+          if (this.calculationCache.size > 50) {
+            const entries = Array.from(this.calculationCache.entries());
+            entries.sort((a, b) => a[1].timestamp - b[1].timestamp);
+            this.calculationCache.delete(entries[0][0]);
+          }
+
+          this.isCalculating = false;
+          this.notifyCallbacks(merchant, { loading: false, recommendation: result, cartValue });
+          
+          resolve(result);
+        } catch (error) {
+          this.isCalculating = false;
+          this.notifyCallbacks(merchant, { loading: false, error, cartValue });
+          resolve(null);
+        }
+        
+        this.debounceTimers.delete(key);
+      }, debounceMs);
+
+      this.debounceTimers.set(key, timer);
+    });
+  }
+
+  notifyCallbacks(merchant, data) {
+    const key = this.getMerchantKey(merchant);
+    const callbacks = this.calculationCallbacks.get(key);
+    if (callbacks) {
+      callbacks.forEach(callback => {
+        try {
+          callback(data);
+        } catch (error) {
+          console.error('Wisor: Callback error:', error);
+        }
+      });
+    }
+  }
+
+  getMerchantKey(merchant) {
+    return typeof merchant === 'string' ? merchant : (merchant.name || merchant.hostname || 'unknown');
+  }
+
+  clearCache() {
+    this.calculationCache.clear();
+  }
+
+  getCacheStats() {
+    return {
+      size: this.calculationCache.size,
+      activeCallbacks: Array.from(this.calculationCallbacks.keys()).length,
+      isCalculating: this.isCalculating
+    };
   }
 }

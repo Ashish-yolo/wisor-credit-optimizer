@@ -6,6 +6,8 @@ class WisorContentScript {
     this.cardDetector = new CardDetector();
     this.widget = null;
     this.isInitialized = false;
+    this.currentSubscription = null;
+    this.currentMerchant = null;
   }
 
   init() {
@@ -100,11 +102,32 @@ class WisorContentScript {
           category: 'shopping'
         };
         
-        // Get recommendation (now async with Claude integration)
-        console.log('Wisor: Calling recommendation engine...', {merchant, finalCartValue});
-        const recommendation = await this.recommendationEngine.getRecommendationForMerchant(
+        // Get recommendation with reactive updates
+        console.log('Wisor: Calling reactive recommendation engine...', {merchant, finalCartValue});
+        
+        // Subscribe to live updates for this merchant
+        if (this.currentSubscription) {
+          this.currentSubscription();
+        }
+        
+        this.currentMerchant = merchant;
+        this.currentSubscription = this.recommendationEngine.subscribeToRewardUpdates(
           merchant,
-          finalCartValue
+          (updateData) => {
+            if (updateData.loading) {
+              this.updateWidgetLoadingState();
+            } else if (updateData.recommendation) {
+              this.updateWidgetRecommendation(updateData.recommendation);
+            } else if (updateData.error) {
+              console.error('Wisor: Reactive recommendation error:', updateData.error);
+            }
+          }
+        );
+        
+        const recommendation = await this.recommendationEngine.getReactiveRecommendation(
+          merchant,
+          finalCartValue,
+          300 // 300ms debounce
         );
         
         console.log('Wisor: Got recommendation result:', recommendation);
@@ -378,6 +401,56 @@ class WisorContentScript {
     return indicators.some(indicator => 
       url.includes(indicator) || pathname.includes(indicator)
     );
+  }
+
+  updateWidgetLoadingState() {
+    if (this.widget && document.body.contains(this.widget)) {
+      const recommendationSection = this.widget.querySelector('.wisor-recommendation');
+      if (recommendationSection) {
+        recommendationSection.innerHTML = `
+          <div class="wisor-loading">
+            <div class="wisor-spinner"></div>
+            <span>Calculating best rewards...</span>
+          </div>
+        `;
+      }
+    }
+  }
+
+  updateWidgetRecommendation(recommendation) {
+    if (this.widget && document.body.contains(this.widget) && recommendation?.userCardRecommendations?.length > 0) {
+      const recommendationSection = this.widget.querySelector('.wisor-recommendation');
+      const topRecommendation = recommendation.userCardRecommendations[0];
+      
+      if (recommendationSection) {
+        recommendationSection.innerHTML = `
+          <div class="wisor-best-card">
+            <div class="wisor-card-header">
+              <span class="wisor-card-icon">💳</span>
+              <div>
+                <div class="wisor-card-name">${topRecommendation.card.name}</div>
+                <div class="wisor-card-bank">${topRecommendation.card.bank}</div>
+              </div>
+              <div class="wisor-reward-badge">
+                ₹${topRecommendation.value}
+              </div>
+            </div>
+            <div class="wisor-card-description">
+              ${topRecommendation.description}
+              ${recommendation.aiPowered ? ' <span class="wisor-ai-badge">🤖 AI</span>' : ''}
+            </div>
+          </div>
+        `;
+      }
+    }
+  }
+
+  // Cleanup method
+  cleanup() {
+    if (this.currentSubscription) {
+      this.currentSubscription();
+      this.currentSubscription = null;
+    }
   }
 
   showDemoWidget() {

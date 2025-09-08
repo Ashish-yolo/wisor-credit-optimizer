@@ -8,6 +8,7 @@ import {
   TextInput,
   Alert
 } from 'react-native';
+import AddUserCardScreen from './AddUserCardScreen';
 import { LinearGradient } from 'expo-linear-gradient';
 import { 
   CreditCard, 
@@ -17,7 +18,11 @@ import {
   Star,
   TrendingUp,
   DollarSign,
-  Calendar
+  Calendar,
+  Tag,
+  Clock,
+  Gift,
+  Zap
 } from 'lucide-react-native';
 
 interface CreditCardData {
@@ -35,6 +40,21 @@ interface CreditCardData {
   rewardsEarned: number;
   nextBillDate: string;
   outstandingAmount: number;
+  source?: 'static' | 'user-added' | 'detected';
+  activeOffers?: DynamicOfferData[];
+  customRewards?: { [category: string]: string };
+}
+
+interface DynamicOfferData {
+  id: string;
+  title: string;
+  description: string;
+  rate: number;
+  type: 'cashback' | 'points' | 'discount';
+  category: string;
+  expires: string;
+  maxBenefit?: number;
+  source: 'scraped' | 'manual';
 }
 
 const CardManagementScreen = () => {
@@ -53,7 +73,31 @@ const CardManagementScreen = () => {
       monthlySpend: 25400,
       rewardsEarned: 1270,
       nextBillDate: '15 Aug',
-      outstandingAmount: 23450
+      outstandingAmount: 23450,
+      source: 'static',
+      activeOffers: [
+        {
+          id: 'hdfc-dining-offer',
+          title: '20% off on Zomato',
+          description: '20% discount up to ₹100 on food delivery',
+          rate: 20,
+          type: 'discount',
+          category: 'dining',
+          expires: '2025-09-15T23:59:59.000Z',
+          maxBenefit: 100,
+          source: 'scraped'
+        },
+        {
+          id: 'hdfc-shopping-offer',
+          title: 'Extra 5% on Amazon',
+          description: 'Additional 5% cashback on Amazon purchases',
+          rate: 5,
+          type: 'cashback',
+          category: 'shopping',
+          expires: '2025-09-30T23:59:59.000Z',
+          source: 'scraped'
+        }
+      ]
     },
     {
       id: '2',
@@ -69,7 +113,21 @@ const CardManagementScreen = () => {
       monthlySpend: 18200,
       rewardsEarned: 910,
       nextBillDate: '18 Aug',
-      outstandingAmount: 8900
+      outstandingAmount: 8900,
+      source: 'static',
+      activeOffers: [
+        {
+          id: 'sbi-flipkart-offer',
+          title: '10% instant discount',
+          description: '10% instant discount on Flipkart up to ₹1500',
+          rate: 10,
+          type: 'discount',
+          category: 'shopping',
+          expires: '2025-10-31T23:59:59.000Z',
+          maxBenefit: 1500,
+          source: 'scraped'
+        }
+      ]
     },
     {
       id: '3',
@@ -85,11 +143,25 @@ const CardManagementScreen = () => {
       monthlySpend: 12800,
       rewardsEarned: 640,
       nextBillDate: '22 Aug',
-      outstandingAmount: 12340
+      outstandingAmount: 12340,
+      source: 'static',
+      activeOffers: [
+        {
+          id: 'icici-amazon-prime',
+          title: 'Prime Day Special',
+          description: 'Extra 2% cashback during Prime Day events',
+          rate: 2,
+          type: 'cashback',
+          category: 'shopping',
+          expires: '2025-10-15T23:59:59.000Z',
+          source: 'scraped'
+        }
+      ]
     }
   ]);
 
   const [showAddCard, setShowAddCard] = useState(false);
+  const [showAdvancedAddCard, setShowAdvancedAddCard] = useState(false);
   const [newCard, setNewCard] = useState({
     bankName: '',
     cardName: '',
@@ -147,9 +219,117 @@ const CardManagementScreen = () => {
     );
   };
 
+  const handleAdvancedCardAdd = (newCardData: any) => {
+    const enhancedCard: CreditCardData = {
+      id: newCardData.id,
+      bankName: newCardData.bank,
+      cardName: newCardData.name,
+      cardType: 'Visa' as any,
+      lastFourDigits: newCardData.lastFourDigits,
+      primaryBenefit: Object.keys(newCardData.customRewards)[0] || 'General',
+      rewardRate: newCardData.verification?.method === 'auto-scraped' ? 'Auto-detected' : 'Custom',
+      annualFee: 0,
+      isActive: true,
+      color: [newCardData.color, newCardData.color + '80'],
+      monthlySpend: 0,
+      rewardsEarned: 0,
+      nextBillDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }),
+      outstandingAmount: 0,
+      source: 'user-added',
+      customRewards: Object.keys(newCardData.customRewards).reduce((acc, key) => {
+        const reward = newCardData.customRewards[key];
+        acc[key] = `${reward.rate}% ${reward.type}`;
+        return acc;
+      }, {} as any)
+    };
+
+    setCards([enhancedCard, ...cards]);
+    setShowAdvancedAddCard(false);
+
+    console.log('Added enhanced card:', enhancedCard);
+  };
+
   const totalMonthlySpend = cards.reduce((sum, card) => sum + card.monthlySpend, 0);
   const totalRewards = cards.reduce((sum, card) => sum + card.rewardsEarned, 0);
   const totalOutstanding = cards.reduce((sum, card) => sum + card.outstandingAmount, 0);
+
+  // Helper function to get offer type icon
+  const getOfferIcon = (type: string) => {
+    switch (type) {
+      case 'discount': return Tag;
+      case 'cashback': return DollarSign;
+      case 'points': return Gift;
+      default: return Star;
+    }
+  };
+
+  // Helper function to check if offer is expiring soon
+  const isOfferExpiringSoon = (expires: string) => {
+    const expiryDate = new Date(expires);
+    const now = new Date();
+    const diffInDays = Math.ceil((expiryDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+    return diffInDays <= 7;
+  };
+
+  // Render active offers section
+  const renderActiveOffers = (card: CreditCardData) => {
+    if (!card.activeOffers || card.activeOffers.length === 0) return null;
+
+    return (
+      <View style={styles.offersSection}>
+        <View style={styles.offersSectionHeader}>
+          <Zap size={16} color="#F59E0B" />
+          <Text style={styles.offersSectionTitle}>Active Offers</Text>
+          <View style={styles.offerCountBadge}>
+            <Text style={styles.offerCountText}>{card.activeOffers.length}</Text>
+          </View>
+        </View>
+        
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.offersScrollView}>
+          {card.activeOffers.map((offer) => {
+            const OfferIcon = getOfferIcon(offer.type);
+            const isExpiringSoon = isOfferExpiringSoon(offer.expires);
+            
+            return (
+              <View key={offer.id} style={[styles.offerCard, isExpiringSoon && styles.offerCardExpiring]}>
+                <View style={styles.offerHeader}>
+                  <OfferIcon size={14} color={isExpiringSoon ? "#EF4444" : "#10B981"} />
+                  <Text style={[styles.offerTitle, isExpiringSoon && styles.offerTitleExpiring]} numberOfLines={1}>
+                    {offer.title}
+                  </Text>
+                </View>
+                
+                <Text style={styles.offerDescription} numberOfLines={2}>
+                  {offer.description}
+                </Text>
+                
+                <View style={styles.offerFooter}>
+                  <View style={[styles.offerTypeBadge, { backgroundColor: offer.type === 'discount' ? '#FEE2E2' : '#D1FAE5' }]}>
+                    <Text style={[styles.offerTypeText, { color: offer.type === 'discount' ? '#DC2626' : '#059669' }]}>
+                      {offer.rate}% {offer.type}
+                    </Text>
+                  </View>
+                  
+                  <View style={styles.offerExpiry}>
+                    <Clock size={10} color={isExpiringSoon ? "#EF4444" : "#6B7280"} />
+                    <Text style={[styles.offerExpiryText, isExpiringSoon && styles.offerExpiryTextExpiring]}>
+                      {new Date(offer.expires).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
+                    </Text>
+                  </View>
+                </View>
+                
+                {offer.source === 'scraped' && (
+                  <View style={styles.offerSourceBadge}>
+                    <Text style={styles.offerSourceText}>Auto-detected</Text>
+                  </View>
+                )}
+              </View>
+            );
+          })}
+        </ScrollView>
+      </View>
+    );
+  };
 
   if (showAddCard) {
     return (
@@ -218,6 +398,16 @@ const CardManagementScreen = () => {
     );
   }
 
+  // Show advanced add card screen
+  if (showAdvancedAddCard) {
+    return (
+      <AddUserCardScreen
+        onBack={() => setShowAdvancedAddCard(false)}
+        onCardAdded={handleAdvancedCardAdd}
+      />
+    );
+  }
+
   return (
     <View style={styles.container}>
       {/* Header with Portfolio Stats */}
@@ -240,15 +430,29 @@ const CardManagementScreen = () => {
       </View>
 
       <ScrollView style={styles.scrollContainer} showsVerticalScrollIndicator={false}>
-        {/* Add New Card Button */}
-        <TouchableOpacity 
-          style={styles.addCardButton}
-          onPress={() => setShowAddCard(true)}
-          activeOpacity={0.7}
-        >
-          <Plus size={24} color="#3B82F6" />
-          <Text style={styles.addCardButtonText}>Add New Credit Card</Text>
-        </TouchableOpacity>
+        {/* Enhanced Add New Card Buttons */}
+        <View style={styles.addCardOptionsContainer}>
+          <TouchableOpacity 
+            style={styles.addCardButtonPrimary}
+            onPress={() => setShowAdvancedAddCard(true)}
+            activeOpacity={0.7}
+          >
+            <Zap size={24} color="white" />
+            <View style={styles.addCardButtonContent}>
+              <Text style={styles.addCardButtonTextPrimary}>Smart Add Card</Text>
+              <Text style={styles.addCardButtonSubtext}>Auto-detect rewards & offers</Text>
+            </View>
+          </TouchableOpacity>
+          
+          <TouchableOpacity 
+            style={styles.addCardButtonSecondary}
+            onPress={() => setShowAddCard(true)}
+            activeOpacity={0.7}
+          >
+            <Plus size={20} color="#3B82F6" />
+            <Text style={styles.addCardButtonTextSecondary}>Quick Add</Text>
+          </TouchableOpacity>
+        </View>
 
         {/* Cards List */}
         <View style={styles.cardsContainer}>
@@ -327,6 +531,9 @@ const CardManagementScreen = () => {
                   </View>
                 )}
               </View>
+
+              {/* Active Offers Section */}
+              {renderActiveOffers(card)}
 
               {/* Card Actions */}
               <View style={styles.cardActions}>
@@ -431,6 +638,49 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   addCardButtonText: {
+    color: '#3B82F6',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  
+  // Enhanced Add Card Styles
+  addCardOptionsContainer: {
+    gap: 12,
+    marginTop: 16,
+  },
+  addCardButtonPrimary: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#3B82F6',
+    padding: 16,
+    borderRadius: 12,
+    gap: 12,
+  },
+  addCardButtonContent: {
+    flex: 1,
+  },
+  addCardButtonTextPrimary: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  addCardButtonSubtext: {
+    color: 'rgba(255,255,255,0.8)',
+    fontSize: 14,
+    marginTop: 2,
+  },
+  addCardButtonSecondary: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'white',
+    padding: 14,
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: '#E5E7EB',
+    gap: 8,
+  },
+  addCardButtonTextSecondary: {
     color: '#3B82F6',
     fontSize: 16,
     fontWeight: '600',
@@ -681,6 +931,118 @@ const styles = StyleSheet.create({
   addButtonText: {
     color: 'white',
     fontSize: 16,
+    fontWeight: '600',
+  },
+
+  // Offers Section Styles
+  offersSection: {
+    backgroundColor: 'white',
+    borderRadius: 12,
+    padding: 16,
+    marginTop: 12,
+    borderWidth: 1,
+    borderColor: '#F3F4F6',
+  },
+  offersSectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+    gap: 8,
+  },
+  offersSectionTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1F2937',
+    flex: 1,
+  },
+  offerCountBadge: {
+    backgroundColor: '#FEF3C7',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  offerCountText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#D97706',
+  },
+  offersScrollView: {
+    marginHorizontal: -4,
+  },
+  offerCard: {
+    backgroundColor: '#F9FAFB',
+    borderRadius: 12,
+    padding: 12,
+    marginHorizontal: 4,
+    width: 200,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    position: 'relative',
+  },
+  offerCardExpiring: {
+    borderColor: '#FECACA',
+    backgroundColor: '#FEF2F2',
+  },
+  offerHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+    gap: 6,
+  },
+  offerTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#1F2937',
+    flex: 1,
+  },
+  offerTitleExpiring: {
+    color: '#DC2626',
+  },
+  offerDescription: {
+    fontSize: 12,
+    color: '#6B7280',
+    lineHeight: 16,
+    marginBottom: 10,
+  },
+  offerFooter: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  offerTypeBadge: {
+    paddingHorizontal: 6,
+    paddingVertical: 3,
+    borderRadius: 6,
+  },
+  offerTypeText: {
+    fontSize: 11,
+    fontWeight: '600',
+  },
+  offerExpiry: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 3,
+  },
+  offerExpiryText: {
+    fontSize: 10,
+    color: '#6B7280',
+  },
+  offerExpiryTextExpiring: {
+    color: '#DC2626',
+    fontWeight: '600',
+  },
+  offerSourceBadge: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+    paddingHorizontal: 4,
+    paddingVertical: 2,
+    borderRadius: 4,
+  },
+  offerSourceText: {
+    fontSize: 9,
+    color: '#3B82F6',
     fontWeight: '600',
   },
 });

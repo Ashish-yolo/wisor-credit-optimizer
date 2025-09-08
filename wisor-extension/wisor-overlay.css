@@ -233,3 +233,52 @@
   transform: scale(1.1);
   color: #f59e0b;
 }
+
+/* Loading state styles */
+.wisor-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 20px;
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+.wisor-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top: 2px solid white;
+  border-radius: 50%;
+  animation: wisor-spin 1s linear infinite;
+}
+
+@keyframes wisor-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* AI badge styles */
+.wisor-ai-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(59, 130, 246, 0.2);
+  color: #93c5fd;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  margin-left: 8px;
+}
+
+/* Real-time update animations */
+.wisor-recommendation {
+  transition: all 0.3s ease;
+}
+
+.wisor-recommendation.updating {
+  opacity: 0.7;
+  transform: scale(0.98);
+}

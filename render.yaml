@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: wisor-enhanced-backend
+    runtime: node
+    plan: free
+    rootDir: wisor-backend
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: ANTHROPIC_API_KEY
+        sync: false # This will need to be set manually in Render dashboard
+    healthCheckPath: /health

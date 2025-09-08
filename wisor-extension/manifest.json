@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Wisor - Smart Credit Card Assistant",
-  "version": "1.4.3",
-  "description": "Get instant credit card recommendations while shopping online. Maximize your rewards effortlessly.",
+  "name": "Wisor - Enhanced Credit Card Assistant",
+  "version": "2.0.0",
+  "description": "Smart credit card optimization with user-added cards, dynamic offers, and AI-powered recommendations. Auto-detects rewards and tracks offers from major websites.",
   
   "permissions": [
     "activeTab",
@@ -32,7 +32,7 @@
         "https://www.nykaa.com/*",
         "https://www.ajio.com/*"
       ],
-      "js": ["credit-cards-data.js", "merchant-detector.js", "recommendation-engine.js", "card-detector.js", "content.js"],
+      "js": ["credit-cards-data.js", "enhanced-card-service.js", "merchant-detector.js", "recommendation-engine.js", "card-detector.js", "content.js"],
       "css": ["wisor-overlay.css"],
       "run_at": "document_end"
     }

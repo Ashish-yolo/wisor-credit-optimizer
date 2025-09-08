@@ -11,3 +11,9 @@
   NODE_VERSION = "18"
   NPM_FLAGS = "--legacy-peer-deps"
   NODE_OPTIONS = "--max_old_space_size=4096"
+  
+# Enhanced Wisor Credit Optimizer v2.0 - Features Added:
+# ✅ User-added cards with dynamic reward fetching  
+# ✅ Auto-updating rewards on amount changes
+# ✅ Real-time offer scraping from major websites
+# 🤖 AI-powered recommendations with offer context

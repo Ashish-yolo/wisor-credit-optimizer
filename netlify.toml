@@ -1,19 +1,15 @@
 [build]
-  base = "wisor-web-app"
-  publish = ".next"
-  command = "npm install && npm run build"
-
-[[plugins]]
-  package = "@netlify/plugin-nextjs"
+  publish = "public"
+  command = "cd wisor-web-app && npm install && npm run build && npm run export && cp -r out/* ../public/app/"
 
 [[redirects]]
-  from = "/*"
-  to = "/404.html"
-  status = 404
+  from = "/app/*"
+  to = "/app/:splat"
+  status = 200
 
 [[redirects]]
-  from = "/api/*"
-  to = "/.netlify/functions/:splat"
+  from = "/app"
+  to = "/app/index.html"
   status = 200
 
 [build.environment]

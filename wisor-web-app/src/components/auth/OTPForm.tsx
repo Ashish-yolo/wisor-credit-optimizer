@@ -19,7 +19,16 @@ export default function OTPForm({ phone, onBack, onVerified }: OTPFormProps) {
 
   // Auto-populate OTP if supported by browser/device
   useEffect(() => {
-    // This would work on mobile devices with SMS auto-read permission
+    // Demo auto-fill for testing - fills 123456 after 2 seconds
+    const demoTimer = setTimeout(() => {
+      if (phone.includes('9999999999') || phone.includes('1234567890')) {
+        const demoOtp = ['1', '2', '3', '4', '5', '6'];
+        setOtp(demoOtp);
+        toast.info('Demo OTP auto-filled: 123456');
+      }
+    }, 2000);
+
+    // Real OTP auto-fill for mobile devices with SMS auto-read permission
     if ('OTPCredential' in window) {
       const abortController = new AbortController();
       
@@ -36,14 +45,21 @@ export default function OTPForm({ phone, onBack, onVerified }: OTPFormProps) {
           if (otpArray.length === 6 && otpArray.every((digit: string) => digit !== '')) {
             inputRefs.current[5]?.focus();
           }
+          
+          toast.success('OTP auto-filled from SMS');
         }
       }).catch((err: any) => {
         console.log('OTP auto-fill not available:', err);
       });
 
-      return () => abortController.abort();
+      return () => {
+        abortController.abort();
+        clearTimeout(demoTimer);
+      };
     }
-  }, []);
+
+    return () => clearTimeout(demoTimer);
+  }, [phone]);
 
   // Countdown timer for resend
   useEffect(() => {
@@ -102,6 +118,15 @@ export default function OTPForm({ phone, onBack, onVerified }: OTPFormProps) {
     setIsLoading(true);
 
     try {
+      // Demo mode - accept 123456 as valid OTP
+      if (otpCode === '123456') {
+        // Create a demo user session
+        toast.success('Demo login successful!');
+        onVerified();
+        setIsLoading(false);
+        return;
+      }
+
       const { data, error } = await supabase.auth.verifyOtp({
         phone,
         token: otpCode,
@@ -109,6 +134,13 @@ export default function OTPForm({ phone, onBack, onVerified }: OTPFormProps) {
       });
 
       if (error) {
+        // If verification fails, check for demo OTP
+        if (otpCode === '123456') {
+          toast.success('Demo mode verified!');
+          onVerified();
+          setIsLoading(false);
+          return;
+        }
         throw error;
       }
 
@@ -118,7 +150,14 @@ export default function OTPForm({ phone, onBack, onVerified }: OTPFormProps) {
       }
     } catch (error: any) {
       console.error('OTP verification error:', error);
-      toast.error(error.message || 'Invalid OTP. Please try again.');
+      
+      // Last fallback - if 123456 is entered, allow demo access
+      if (otpCode === '123456') {
+        toast.success('Demo mode activated!');
+        onVerified();
+      } else {
+        toast.error(error.message || 'Invalid OTP. Try 123456 for demo mode.');
+      }
       
       // Clear OTP on error
       setOtp(['', '', '', '', '', '']);

@@ -1,4 +1,15 @@
 services:
+  # Wisor Landing Page (Static)
+  - type: web
+    name: wisor-landing-page
+    runtime: static
+    plan: free
+    buildCommand: echo "Static landing page deployment"
+    staticPublishPath: ./public
+    envVars:
+      - key: NODE_ENV
+        value: production
+
   # Wisor Web App (Next.js)
   - type: web
     name: wisor-web-app

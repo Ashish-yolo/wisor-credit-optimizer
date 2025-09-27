@@ -1,5 +1,6 @@
 [build]
-  publish = "dist"
+  base = "wisor-web-app"
+  publish = "wisor-web-app/.next"
   command = "npm run build"
 
 [[redirects]]

@@ -1,11 +1,18 @@
 services:
-  # Frontend Landing Page
+  # Wisor Web App (Next.js)
   - type: web
-    name: wisor-landing-page
-    runtime: static
+    name: wisor-web-app
+    runtime: node
     plan: free
-    buildCommand: npm run build
-    staticPublishPath: ./dist
+    rootDir: wisor-web-app
+    buildCommand: npm install && npm run build
+    startCommand: npm start
     envVars:
       - key: NODE_ENV
         value: production
+      - key: NEXT_PUBLIC_SUPABASE_URL
+        value: https://gpqdzgfnkepeexdgtrda.supabase.co
+      - key: NEXT_PUBLIC_SUPABASE_ANON_KEY
+        value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdwcWR6Z2Zua2VwZWV4ZGd0cmRhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg5NjAxOTgsImV4cCI6MjA3NDUzNjE5OH0.4iOn2YvvBREMPOF-NHk3X3t2OxgPrz9gm2UJVg3RapU
+      - key: NEXTAUTH_SECRET
+        value: k8m9n2p5q7r1s4t6u8v0w3x5y7z2a4b6c8d1e3f5g7h9

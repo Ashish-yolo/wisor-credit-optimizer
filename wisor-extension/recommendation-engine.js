@@ -162,22 +162,88 @@ class RecommendationEngine {
     };
   }
 
-  // Fallback to original local logic  
+  // Enhanced local logic with intelligent recommendations
   getLocalRecommendation(merchant, cartValue = 0) {
-    console.log('Wisor: Generating local recommendations...');
+    console.log('Wisor: Generating enhanced local recommendations...');
     
     const recommendations = [];
+    const merchantLower = merchant.toLowerCase();
     
-    // Get user's cards that have benefits for this merchant
+    // Enhanced merchant-specific logic
+    const merchantRules = {
+      'amazon': { 
+        preferred: ['amazon pay icici', 'sbi cashback', 'hdfc millennia'], 
+        baseRate: 0.05, 
+        category: 'Online Shopping' 
+      },
+      'flipkart': { 
+        preferred: ['flipkart axis', 'axis ace', 'sbi cashback'], 
+        baseRate: 0.04, 
+        category: 'E-commerce' 
+      },
+      'zomato': { 
+        preferred: ['zomato hdfc', 'swiggy hdfc', 'axis ace'], 
+        baseRate: 0.10, 
+        category: 'Food Delivery' 
+      },
+      'swiggy': { 
+        preferred: ['swiggy hdfc', 'zomato hdfc', 'axis ace'], 
+        baseRate: 0.10, 
+        category: 'Food Delivery' 
+      },
+      'myntra': { 
+        preferred: ['myntra kotak', 'hdfc millennia', 'axis ace'], 
+        baseRate: 0.03, 
+        category: 'Fashion' 
+      },
+      'makemytrip': { 
+        preferred: ['makemytrip icici', 'hdfc diners', 'axis ace'], 
+        baseRate: 0.04, 
+        category: 'Travel' 
+      }
+    };
+
+    // Find matching merchant rule
+    const matchedRule = Object.keys(merchantRules).find(key => 
+      merchantLower.includes(key)
+    );
+    
+    const rule = matchedRule ? merchantRules[matchedRule] : { 
+      preferred: [], 
+      baseRate: 0.01, 
+      category: 'General' 
+    };
+    
+    // Get user's cards and score them
     for (const cardId of this.userCards) {
       const card = INDIAN_CREDIT_CARDS[cardId];
       if (!card) continue;
       
-      const recommendation = this.calculateCardBenefit(card, merchant, cartValue);
-      if (recommendation.value > 0) {
-        recommendations.push(recommendation);
+      let score = rule.baseRate;
+      let reasoning = `Base reward for ${rule.category}`;
+      
+      // Boost score for preferred cards
+      if (rule.preferred.some(pref => card.name.toLowerCase().includes(pref.toLowerCase()))) {
+        score *= 2;
+        reasoning = `Preferred card for ${rule.category} - Enhanced rewards`;
       }
+      
+      // Calculate reward value
+      const rewardValue = Math.round(cartValue * score);
+      
+      recommendations.push({
+        card: card,
+        value: rewardValue,
+        description: reasoning,
+        rate: score * 100,
+        type: 'enhanced-local',
+        cartValue: cartValue,
+        merchant: rule.category
+      });
     }
+    
+    // Sort by value (highest first)
+    recommendations.sort((a, b) => b.value - a.value);
     
     // If no specific benefits found, add generic recommendations
     if (recommendations.length === 0 && this.userCards.length > 0) {

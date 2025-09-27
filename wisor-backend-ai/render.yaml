@@ -26,5 +26,9 @@ services:
         value: ./uploads
       - key: LOG_LEVEL
         value: info
+      - key: ANTHROPIC_API_KEY
+        sync: false  # This will need to be set manually in Render dashboard
+      - key: SERP_API_KEY
+        sync: false  # Optional - for web search functionality
     healthCheckPath: /health
     autoDeploy: true

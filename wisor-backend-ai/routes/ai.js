@@ -208,6 +208,125 @@ router.post('/search',
   }
 );
 
+// Credit card recommendation endpoint
+router.post('/recommend',
+  [
+    body('merchant')
+      .trim()
+      .notEmpty()
+      .withMessage('Merchant is required'),
+    body('cartValue')
+      .optional()
+      .isNumeric()
+      .withMessage('Cart value must be numeric'),
+    body('userCards')
+      .optional()
+      .isArray()
+      .withMessage('User cards must be an array')
+  ],
+  async (req, res) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({
+          error: 'Validation error',
+          details: errors.array()
+        });
+      }
+
+      const { merchant, cartValue = 0, userCards = [] } = req.body;
+      
+      // Build recommendation prompt
+      const recommendationPrompt = `As a credit card expert, recommend the best credit card for a purchase at ${merchant} with cart value ₹${cartValue}.
+
+Available cards:
+${userCards.map(card => `- ${card.card_name} (${card.network})`).join('\n') || 'No user cards provided'}
+
+Consider:
+1. Merchant-specific offers and cashback rates
+2. Cart value and potential rewards
+3. Current promotions and benefits
+4. Overall value proposition
+
+Provide a concise recommendation with:
+- Recommended card name
+- Expected reward/cashback amount
+- Brief reasoning (max 50 words)
+
+Response format:
+{
+  "recommendedCard": "card_name",
+  "rewardValue": number,
+  "reasoning": "brief explanation"
+}`;
+
+      // Get AI recommendation
+      const aiResponse = await claudeService.getFinancialAdvice(
+        'extension_user', 
+        recommendationPrompt,
+        {
+          merchant,
+          cartValue,
+          userCards,
+          type: 'recommendation'
+        }
+      );
+
+      // Parse AI response
+      let recommendation = {
+        recommendedCard: userCards[0]?.card_name || null,
+        rewardValue: Math.round(cartValue * 0.01),
+        reasoning: "Default recommendation"
+      };
+
+      try {
+        // Try to parse JSON from AI response
+        const jsonMatch = aiResponse.response.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          const parsed = JSON.parse(jsonMatch[0]);
+          recommendation = {
+            recommendedCard: parsed.recommendedCard,
+            rewardValue: parsed.rewardValue || recommendation.rewardValue,
+            reasoning: parsed.reasoning || recommendation.reasoning
+          };
+        }
+      } catch (parseError) {
+        console.log('Could not parse AI response as JSON, using fallback');
+      }
+
+      res.json({
+        success: true,
+        recommendation,
+        merchant,
+        cartValue,
+        aiPowered: true,
+        timestamp: new Date().toISOString()
+      });
+
+    } catch (error) {
+      console.error('Recommendation error:', error);
+      
+      // Fallback recommendation
+      const { merchant, cartValue = 0, userCards = [] } = req.body;
+      const fallbackRecommendation = {
+        recommendedCard: userCards[0]?.card_name || null,
+        rewardValue: Math.round(cartValue * 0.01),
+        reasoning: "Fallback recommendation due to AI service unavailability"
+      };
+
+      res.json({
+        success: true,
+        recommendation: fallbackRecommendation,
+        merchant,
+        cartValue,
+        aiPowered: false,
+        fallback: true,
+        timestamp: new Date().toISOString()
+      });
+    }
+  }
+);
+
 // Health check for AI service
 router.get('/health', (req, res) => {
   res.json({

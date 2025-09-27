@@ -1,0 +1,36 @@
+{
+  "name": "wisor-extension",
+  "displayName": "Wisor - Smart Credit Card Assistant",
+  "version": "2.0.0",
+  "description": "AI-powered credit card optimizer with real-time recommendations",
+  "author": "Wisor Team",
+  "scripts": {
+    "dev": "plasmo dev",
+    "build": "plasmo build",
+    "package": "plasmo package"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.38.4",
+    "plasmo": "0.84.0",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "lucide-react": "^0.294.0"
+  },
+  "devDependencies": {
+    "@types/chrome": "0.0.246",
+    "@types/node": "20.8.10",
+    "@types/react": "18.2.37",
+    "@types/react-dom": "18.2.15",
+    "prettier": "3.0.3",
+    "typescript": "5.2.2"
+  },
+  "manifest": {
+    "host_permissions": [
+      "https://*/*"
+    ],
+    "permissions": [
+      "storage",
+      "activeTab"
+    ]
+  }
+}

@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wisor Login - Get Started</title>
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body class="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 min-h-screen">
+    <div class="min-h-screen flex items-center justify-center p-4">
+        <div class="w-full max-w-md mx-auto">
+            <div class="bg-white/80 backdrop-blur-md border border-white/20 shadow-2xl rounded-3xl p-8">
+                <!-- Header -->
+                <div class="text-center mb-8">
+                    <div class="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                        <span class="text-white font-bold text-2xl">W</span>
+                    </div>
+                    <h1 class="text-2xl font-bold text-slate-800 mb-2">Welcome to Wisor</h1>
+                    <p class="text-slate-600">Enter your mobile number to get started</p>
+                </div>
+
+                <!-- Demo Instructions -->
+                <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6">
+                    <h3 class="text-sm font-semibold text-blue-800 mb-2">🚀 Demo Mode Available</h3>
+                    <p class="text-xs text-blue-700 mb-2">For testing, use these demo credentials:</p>
+                    <ul class="text-xs text-blue-600 space-y-1">
+                        <li>• Phone: <strong>9999999999</strong> or <strong>1234567890</strong></li>
+                        <li>• OTP: <strong>123456</strong> (auto-fills)</li>
+                    </ul>
+                </div>
+
+                <!-- Login Form -->
+                <form id="loginForm" class="space-y-6">
+                    <div>
+                        <label for="phone" class="block text-sm font-medium text-slate-700 mb-2">
+                            Mobile Number
+                        </label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <span class="text-slate-400">📱</span>
+                            </div>
+                            <div class="absolute inset-y-0 left-10 flex items-center pointer-events-none">
+                                <span class="text-slate-500 text-sm">+91</span>
+                            </div>
+                            <input
+                                id="phone"
+                                type="tel"
+                                value=""
+                                placeholder="9999999999"
+                                class="w-full pl-20 pr-4 py-3 border border-slate-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                maxlength="10"
+                                pattern="[0-9]*"
+                                inputmode="numeric"
+                                required
+                            />
+                        </div>
+                    </div>
+
+                    <button
+                        type="submit"
+                        id="submitBtn"
+                        class="w-full bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold py-3 px-4 rounded-xl hover:from-blue-600 hover:to-purple-600 transition-all duration-200 shadow-lg hover:shadow-xl"
+                    >
+                        Send OTP
+                    </button>
+                </form>
+
+                <!-- OTP Form (hidden initially) -->
+                <div id="otpForm" class="hidden space-y-6">
+                    <div class="text-center">
+                        <h3 class="text-lg font-semibold text-slate-800 mb-2">Enter OTP</h3>
+                        <p class="text-sm text-slate-600">We've sent a 6-digit code to your phone</p>
+                    </div>
+
+                    <div class="flex space-x-2 justify-center">
+                        <input type="text" maxlength="1" class="w-12 h-12 text-center border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+                        <input type="text" maxlength="1" class="w-12 h-12 text-center border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+                        <input type="text" maxlength="1" class="w-12 h-12 text-center border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+                        <input type="text" maxlength="1" class="w-12 h-12 text-center border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+                        <input type="text" maxlength="1" class="w-12 h-12 text-center border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+                        <input type="text" maxlength="1" class="w-12 h-12 text-center border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+                    </div>
+
+                    <button
+                        id="verifyBtn"
+                        class="w-full bg-gradient-to-r from-green-500 to-blue-500 text-white font-semibold py-3 px-4 rounded-xl hover:from-green-600 hover:to-blue-600 transition-all duration-200 shadow-lg hover:shadow-xl"
+                    >
+                        Verify OTP
+                    </button>
+                </div>
+
+                <!-- Extension Download (hidden initially) -->
+                <div id="downloadSection" class="hidden text-center space-y-4">
+                    <div class="text-center">
+                        <div class="w-16 h-16 bg-gradient-to-r from-green-500 to-blue-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                            <span class="text-white text-2xl">✅</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-slate-800 mb-2">Welcome to Wisor!</h3>
+                        <p class="text-slate-600 mb-6">You're all set! Download the extension to start saving money.</p>
+                    </div>
+                    
+                    <a href="/wisor-extension-v2.0-enhanced.zip" 
+                       download
+                       class="inline-flex items-center bg-gradient-to-r from-blue-500 to-purple-500 text-white font-bold px-8 py-3 rounded-xl hover:from-blue-600 hover:to-purple-600 transition-all duration-200 shadow-lg hover:shadow-xl">
+                        <svg class="mr-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        Download Extension
+                    </a>
+
+                    <p class="text-xs text-slate-500 mt-4">
+                        <a href="/#install-guide" class="text-blue-600 hover:underline">Need installation help?</a>
+                    </p>
+                </div>
+
+                <div class="mt-6 text-center">
+                    <a href="/" class="text-sm text-slate-500 hover:text-slate-700">← Back to Home</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Demo login flow
+        const loginForm = document.getElementById('loginForm');
+        const otpForm = document.getElementById('otpForm');
+        const downloadSection = document.getElementById('downloadSection');
+        const phoneInput = document.getElementById('phone');
+        const otpInputs = document.querySelectorAll('#otpForm input');
+
+        // Format phone number input
+        phoneInput.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length > 10) value = value.slice(0, 10);
+            e.target.value = value;
+        });
+
+        // Handle login form submission
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const phone = phoneInput.value;
+            
+            if (phone.length !== 10) {
+                alert('Please enter a valid 10-digit mobile number');
+                return;
+            }
+
+            // Show OTP form
+            loginForm.style.display = 'none';
+            otpForm.classList.remove('hidden');
+
+            // Auto-fill for demo numbers
+            if (phone === '9999999999' || phone === '1234567890') {
+                setTimeout(() => {
+                    const demoOtp = ['1', '2', '3', '4', '5', '6'];
+                    otpInputs.forEach((input, index) => {
+                        input.value = demoOtp[index];
+                    });
+                    
+                    // Show success message
+                    const message = document.createElement('div');
+                    message.className = 'text-center text-sm text-green-600 mt-2';
+                    message.textContent = '✅ Demo OTP auto-filled: 123456';
+                    otpForm.appendChild(message);
+                }, 2000);
+            }
+        });
+
+        // Handle OTP input
+        otpInputs.forEach((input, index) => {
+            input.addEventListener('input', function(e) {
+                if (e.target.value.length === 1 && index < otpInputs.length - 1) {
+                    otpInputs[index + 1].focus();
+                }
+            });
+
+            input.addEventListener('keydown', function(e) {
+                if (e.key === 'Backspace' && e.target.value === '' && index > 0) {
+                    otpInputs[index - 1].focus();
+                }
+            });
+        });
+
+        // Handle OTP verification
+        document.getElementById('verifyBtn').addEventListener('click', function() {
+            const otp = Array.from(otpInputs).map(input => input.value).join('');
+            
+            if (otp.length !== 6) {
+                alert('Please enter complete 6-digit OTP');
+                return;
+            }
+
+            if (otp === '123456' || otp === '000000') {
+                // Show download section
+                otpForm.style.display = 'none';
+                downloadSection.classList.remove('hidden');
+            } else {
+                alert('Invalid OTP. For demo, use 123456');
+                otpInputs.forEach(input => input.value = '');
+                otpInputs[0].focus();
+            }
+        });
+
+        // Focus first input on load
+        phoneInput.focus();
+    </script>
+</body>
+</html>

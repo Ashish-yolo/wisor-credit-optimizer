@@ -3,7 +3,7 @@ class RecommendationEngine {
   constructor() {
     this.userCards = USER_CARDS;
     // Production backend URL - will fallback to local if needed
-    this.backendUrl = 'https://wisor-credit-optimizer.onrender.com';
+    this.backendUrl = 'https://wisor-ai-backend.onrender.com';
     this.fallbackToLocal = true;
     
     // Reactive calculation setup
@@ -27,9 +27,9 @@ class RecommendationEngine {
     
     const localPromise = new Promise(resolve => {
       setTimeout(() => {
-        console.log('Wisor: 8 second timeout - showing local recommendations');
+        console.log('Wisor: 20 second timeout - showing local recommendations');
         resolve(this.getLocalRecommendation(merchant, cartValue));
-      }, 8000); // Show local after 8 seconds
+      }, 20000); // Show local after 20 seconds
     });
 
     // Return whichever comes first
@@ -67,11 +67,11 @@ class RecommendationEngine {
     };
 
     try {
-      // Set timeout for API call (30 seconds max - Claude can be slow)
+      // Set timeout for API call (45 seconds max - Claude can be slow)
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 30000);
+      const timeoutId = setTimeout(() => controller.abort(), 45000);
       
-      const response = await fetch(`${this.backendUrl}/api/recommend`, {
+      const response = await fetch(`${this.backendUrl}/api/ai/recommend`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -98,7 +98,7 @@ class RecommendationEngine {
     } catch (error) {
       console.error('Wisor: Claude API error:', error);
       if (error.name === 'AbortError') {
-        console.log('Wisor: Claude API request timed out after 30s, using local fallback');
+        console.log('Wisor: Claude API request timed out after 45s, using local fallback');
       } else {
         console.error('Wisor: Error details:', {
           name: error.name,

@@ -1,4 +1,16 @@
 services:
+  # Frontend Landing Page
+  - type: web
+    name: wisor-landing-page
+    runtime: static
+    plan: free
+    buildCommand: npm run build
+    staticPublishPath: ./dist
+    envVars:
+      - key: NODE_ENV
+        value: production
+
+  # Backend API (Optional)
   - type: web
     name: wisor-enhanced-backend
     runtime: node

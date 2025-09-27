@@ -83,23 +83,82 @@
                 Auto-detects rewards from 6+ banks and tracks offers from major websites. Save ₹5,000-12,000 annually.
             </p>
             
-            <div class="flex flex-col sm:flex-row gap-6 justify-center mb-16">
-                <button class="bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white font-medium px-8 py-4 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
-                    <span class="inline-flex items-center">
-                        <span class="mr-2">📱</span>
-                        Download App (Coming Soon)
-                    </span>
-                </button>
-                <a href="https://github.com/Ashish-yolo/wisor-credit-optimizer" 
-                   target="_blank"
-                   class="bg-white/80 hover:bg-white text-slate-700 hover:text-slate-900 border border-slate-200 hover:border-slate-300 font-medium px-8 py-4 rounded-xl transition-all duration-200 shadow-md hover:shadow-lg backdrop-blur-sm">
-                    <span class="inline-flex items-center">
-                        View Source Code
-                        <svg class="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+            <!-- Main Download Section -->
+            <div class="bg-white/80 backdrop-blur-md border border-white/20 shadow-2xl rounded-3xl p-8 mb-16 max-w-4xl mx-auto">
+                <div class="text-center mb-8">
+                    <h3 class="text-2xl font-bold mb-2">🚀 Get Wisor Extension</h3>
+                    <p class="text-slate-600">Choose your preferred version and start saving money today!</p>
+                </div>
+                
+                <!-- Featured Download -->
+                <div class="bg-gradient-to-r from-primary-500 to-accent-500 rounded-2xl p-6 mb-6 text-white text-center">
+                    <div class="mb-4">
+                        <span class="inline-flex items-center bg-white/20 px-3 py-1 rounded-full text-sm font-medium mb-2">
+                            🔥 RECOMMENDED
+                        </span>
+                        <h4 class="text-xl font-bold">Enhanced Extension v2.0</h4>
+                        <p class="text-white/90 text-sm">Latest version with AI-powered recommendations & dynamic offers</p>
+                    </div>
+                    <a href="/wisor-extension-v2.0-enhanced.zip" 
+                       download
+                       class="bg-white text-primary-600 hover:bg-gray-50 font-semibold px-8 py-4 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 inline-flex items-center">
+                        <svg class="mr-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                         </svg>
-                    </span>
-                </a>
+                        Download v2.0 Enhanced
+                        <span class="ml-2 bg-primary-100 text-primary-700 px-2 py-1 rounded text-xs">FREE</span>
+                    </a>
+                </div>
+
+                <!-- Alternative Versions -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <div class="bg-slate-50 rounded-xl p-4 text-center">
+                        <h5 class="font-semibold text-slate-800 mb-2">Extension v1.3.1</h5>
+                        <p class="text-xs text-slate-600 mb-3">Stable version with core features</p>
+                        <a href="/wisor-extension-v1.3.1-mac.zip" 
+                           download
+                           class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-4 py-2 rounded-lg text-sm transition-colors inline-flex items-center">
+                            <svg class="mr-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3"></path>
+                            </svg>
+                            Download v1.3.1
+                        </a>
+                    </div>
+                    <div class="bg-slate-50 rounded-xl p-4 text-center">
+                        <h5 class="font-semibold text-slate-800 mb-2">Extension v1.3</h5>
+                        <p class="text-xs text-slate-600 mb-3">Legacy version for compatibility</p>
+                        <a href="/wisor-extension-v1.3-mac.zip" 
+                           download
+                           class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-4 py-2 rounded-lg text-sm transition-colors inline-flex items-center">
+                            <svg class="mr-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3"></path>
+                            </svg>
+                            Download v1.3
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="flex flex-col sm:flex-row gap-3 justify-center text-center">
+                    <button onclick="scrollToInstallGuide()" class="bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 px-6 py-3 rounded-xl text-sm transition-colors inline-flex items-center justify-center">
+                        <svg class="mr-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        Installation Guide
+                    </button>
+                    <button class="bg-green-50 hover:bg-green-100 text-green-700 border border-green-200 px-6 py-3 rounded-xl text-sm transition-colors inline-flex items-center justify-center">
+                        <span class="mr-2">📱</span>
+                        Mobile App (Coming Soon)
+                    </button>
+                    <a href="https://github.com/Ashish-yolo/wisor-credit-optimizer" 
+                       target="_blank"
+                       class="bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 px-6 py-3 rounded-xl text-sm transition-colors inline-flex items-center justify-center">
+                        <svg class="mr-2 w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 0C4.477 0 0 4.484 0 10.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0110 4.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.203 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.942.359.31.678.921.678 1.856 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0020 10.017C20 4.484 15.522 0 10 0z" clip-rule="evenodd"></path>
+                        </svg>
+                        Source Code
+                    </a>
+                </div>
             </div>
 
             <!-- Stats -->
@@ -124,7 +183,308 @@
         </div>
     </section>
 
-    <!-- Features Section -->
+    <!-- Installation Guide -->
+    <section id="install-guide" class="py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-blue-50 to-indigo-50">
+        <div class="max-w-5xl mx-auto">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4">🚀 Easy Installation in 3 Steps</h2>
+                <p class="text-xl text-slate-600">Get started with Wisor in under 2 minutes</p>
+            </div>
+
+            <!-- Step-by-step guide -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
+                <!-- Step 1 -->
+                <div class="bg-white/90 backdrop-blur-md border border-white/20 shadow-xl rounded-2xl p-8 text-center relative">
+                    <div class="absolute -top-4 left-1/2 transform -translate-x-1/2 w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-sm">1</div>
+                    <div class="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-6 mt-4">
+                        <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Download Extension</h3>
+                    <p class="text-slate-600 mb-4">Click the "Download v2.0 Enhanced" button to get the latest version with all features.</p>
+                    <div class="bg-slate-50 p-3 rounded-lg text-xs text-slate-600">
+                        <code>wisor-extension-v2.0-enhanced.zip</code>
+                    </div>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="bg-white/90 backdrop-blur-md border border-white/20 shadow-xl rounded-2xl p-8 text-center relative">
+                    <div class="absolute -top-4 left-1/2 transform -translate-x-1/2 w-8 h-8 bg-green-600 rounded-full flex items-center justify-center text-white font-bold text-sm">2</div>
+                    <div class="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center mx-auto mb-6 mt-4">
+                        <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4V2a1 1 0 011-1h8a1 1 0 011 1v2M7 4h10M7 4l-2 14h14l-2-14M10 9v4M14 9v4"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Extract Files</h3>
+                    <p class="text-slate-600 mb-4">Unzip the downloaded file to any folder on your computer. Remember the location!</p>
+                    <div class="bg-slate-50 p-3 rounded-lg text-xs text-slate-600">
+                        Right-click → Extract All → Choose folder
+                    </div>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="bg-white/90 backdrop-blur-md border border-white/20 shadow-xl rounded-2xl p-8 text-center relative">
+                    <div class="absolute -top-4 left-1/2 transform -translate-x-1/2 w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center text-white font-bold text-sm">3</div>
+                    <div class="w-16 h-16 bg-purple-100 rounded-2xl flex items-center justify-center mx-auto mb-6 mt-4">
+                        <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Install in Chrome</h3>
+                    <p class="text-slate-600 mb-4">Open Chrome extensions, enable Developer mode, and load the unpacked extension.</p>
+                    <div class="bg-slate-50 p-3 rounded-lg text-xs text-slate-600">
+                        chrome://extensions → Developer mode ON
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detailed Chrome Installation -->
+            <div class="bg-gradient-to-r from-slate-800 to-slate-900 rounded-2xl p-8 text-white">
+                <h3 class="text-xl font-bold mb-6 text-center">🔧 Detailed Chrome Installation Steps</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-4">
+                        <div class="flex items-start space-x-3">
+                            <div class="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">1</div>
+                            <div>
+                                <p class="font-medium">Open Chrome Extensions</p>
+                                <p class="text-sm text-slate-300">Type <code class="bg-slate-700 px-1 rounded">chrome://extensions</code> in address bar</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-3">
+                            <div class="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">2</div>
+                            <div>
+                                <p class="font-medium">Enable Developer Mode</p>
+                                <p class="text-sm text-slate-300">Toggle the "Developer mode" switch in top-right corner</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-3">
+                            <div class="w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">3</div>
+                            <div>
+                                <p class="font-medium">Load Unpacked Extension</p>
+                                <p class="text-sm text-slate-300">Click "Load unpacked" and select the extracted folder</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="flex items-start space-x-3">
+                            <div class="w-6 h-6 bg-orange-500 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">4</div>
+                            <div>
+                                <p class="font-medium">Verify Installation</p>
+                                <p class="text-sm text-slate-300">You should see "Wisor" extension in your extensions list</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-3">
+                            <div class="w-6 h-6 bg-pink-500 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">5</div>
+                            <div>
+                                <p class="font-medium">Pin Extension</p>
+                                <p class="text-sm text-slate-300">Click the puzzle piece icon and pin Wisor for easy access</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-3">
+                            <div class="w-6 h-6 bg-cyan-500 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">6</div>
+                            <div>
+                                <p class="font-medium">Start Shopping!</p>
+                                <p class="text-sm text-slate-300">Visit Amazon, Flipkart, or Zomato to see recommendations</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- What's New Alert -->
+            <div class="mt-8 bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200 rounded-xl p-6">
+                <div class="flex items-center justify-center mb-4">
+                    <span class="text-2xl mr-2">⚡</span>
+                    <h4 class="text-lg font-bold text-yellow-800">What's New in v2.0 Enhanced</h4>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-yellow-800">
+                    <div class="flex items-center space-x-2">
+                        <span class="w-2 h-2 bg-yellow-500 rounded-full"></span>
+                        <span>AI-powered smart card recommendations</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <span class="w-2 h-2 bg-yellow-500 rounded-full"></span>
+                        <span>Real-time dynamic offer detection</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <span class="w-2 h-2 bg-yellow-500 rounded-full"></span>
+                        <span>Auto-detection of 6+ major banks</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <span class="w-2 h-2 bg-yellow-500 rounded-full"></span>
+                        <span>Enhanced UI with expiry warnings</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <span class="w-2 h-2 bg-yellow-500 rounded-full"></span>
+                        <span>Support for 13+ e-commerce sites</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <span class="w-2 h-2 bg-yellow-500 rounded-full"></span>
+                        <span>Instant reward calculations (300ms)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Extension Features Showcase -->
+    <section class="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-purple-50 to-pink-50">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4">🛒 Extension Features</h2>
+                <p class="text-xl text-slate-600">Seamless integration with your favorite shopping sites</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-16">
+                <!-- Feature showcase -->
+                <div class="space-y-8">
+                    <div class="bg-white/80 backdrop-blur-md border border-white/20 shadow-xl rounded-2xl p-6">
+                        <div class="flex items-start space-x-4">
+                            <div class="w-12 h-12 bg-amazon-orange rounded-xl flex items-center justify-center flex-shrink-0" style="background-color: #ff9900;">
+                                <span class="text-white font-bold">A</span>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-bold mb-2">Amazon Integration</h3>
+                                <p class="text-slate-600 text-sm">Automatic card recommendations at checkout with instant cashback calculations. Works on Amazon.in for all product categories.</p>
+                                <div class="mt-2 flex items-center space-x-2">
+                                    <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">Auto-detect</span>
+                                    <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">Real-time</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white/80 backdrop-blur-md border border-white/20 shadow-xl rounded-2xl p-6">
+                        <div class="flex items-start space-x-4">
+                            <div class="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center flex-shrink-0">
+                                <span class="text-white font-bold">F</span>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-bold mb-2">Flipkart & Myntra</h3>
+                                <p class="text-slate-600 text-sm">Smart recommendations for fashion, electronics, and groceries. Detects Big Billion Day offers and bank-specific discounts.</p>
+                                <div class="mt-2 flex items-center space-x-2">
+                                    <span class="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full">Sale alerts</span>
+                                    <span class="bg-orange-100 text-orange-800 text-xs px-2 py-1 rounded-full">Multi-store</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white/80 backdrop-blur-md border border-white/20 shadow-xl rounded-2xl p-6">
+                        <div class="flex items-start space-x-4">
+                            <div class="w-12 h-12 bg-red-500 rounded-xl flex items-center justify-center flex-shrink-0">
+                                <span class="text-white font-bold">Z</span>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-bold mb-2">Food Delivery - Zomato & Swiggy</h3>
+                                <p class="text-slate-600 text-sm">Maximize dining rewards with restaurant-specific recommendations. Perfect for weekend dining and office lunch orders.</p>
+                                <div class="mt-2 flex items-center space-x-2">
+                                    <span class="bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full">Dining</span>
+                                    <span class="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full">5% cashback</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Visual representation -->
+                <div class="bg-white/90 backdrop-blur-md border border-white/20 shadow-2xl rounded-3xl p-8">
+                    <div class="text-center mb-6">
+                        <h3 class="text-xl font-bold mb-2">Extension in Action</h3>
+                        <p class="text-slate-600 text-sm">See live recommendations while you shop</p>
+                    </div>
+                    
+                    <!-- Mock browser window -->
+                    <div class="bg-slate-100 rounded-xl p-4">
+                        <div class="flex items-center space-x-2 mb-4">
+                            <div class="w-3 h-3 bg-red-400 rounded-full"></div>
+                            <div class="w-3 h-3 bg-yellow-400 rounded-full"></div>
+                            <div class="w-3 h-3 bg-green-400 rounded-full"></div>
+                            <div class="bg-white rounded-md px-3 py-1 text-xs text-slate-600 ml-4">amazon.in/checkout</div>
+                        </div>
+                        
+                        <!-- Wisor recommendation overlay -->
+                        <div class="bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg p-4 text-white">
+                            <div class="flex items-center space-x-2 mb-3">
+                                <div class="w-6 h-6 bg-white rounded flex items-center justify-center">
+                                    <span class="text-blue-600 font-bold text-sm">W</span>
+                                </div>
+                                <span class="font-medium">Wisor Recommendation</span>
+                            </div>
+                            <div class="space-y-2 text-sm">
+                                <div class="bg-white/20 rounded p-2">
+                                    <div class="font-medium">💳 HDFC Millennia</div>
+                                    <div class="text-white/90">5% cashback • Save ₹250</div>
+                                </div>
+                                <div class="text-xs text-white/80">
+                                    ⚡ Best card for this purchase
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Supported Sites Grid -->
+            <div class="bg-white/80 backdrop-blur-md border border-white/20 shadow-xl rounded-2xl p-8">
+                <h3 class="text-xl font-bold text-center mb-6">🌐 Supported Shopping Sites</h3>
+                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                    <div class="text-center p-3 rounded-lg bg-gradient-to-b from-orange-50 to-orange-100">
+                        <div class="text-2xl mb-1">🛒</div>
+                        <div class="text-xs font-medium">Amazon</div>
+                    </div>
+                    <div class="text-center p-3 rounded-lg bg-gradient-to-b from-blue-50 to-blue-100">
+                        <div class="text-2xl mb-1">🛍️</div>
+                        <div class="text-xs font-medium">Flipkart</div>
+                    </div>
+                    <div class="text-center p-3 rounded-lg bg-gradient-to-b from-pink-50 to-pink-100">
+                        <div class="text-2xl mb-1">👗</div>
+                        <div class="text-xs font-medium">Myntra</div>
+                    </div>
+                    <div class="text-center p-3 rounded-lg bg-gradient-to-b from-red-50 to-red-100">
+                        <div class="text-2xl mb-1">🍕</div>
+                        <div class="text-xs font-medium">Zomato</div>
+                    </div>
+                    <div class="text-center p-3 rounded-lg bg-gradient-to-b from-orange-50 to-yellow-100">
+                        <div class="text-2xl mb-1">🥘</div>
+                        <div class="text-xs font-medium">Swiggy</div>
+                    </div>
+                    <div class="text-center p-3 rounded-lg bg-gradient-to-b from-blue-50 to-cyan-100">
+                        <div class="text-2xl mb-1">✈️</div>
+                        <div class="text-xs font-medium">MakeMyTrip</div>
+                    </div>
+                    <div class="text-center p-3 rounded-lg bg-gradient-to-b from-green-50 to-green-100">
+                        <div class="text-2xl mb-1">🍎</div>
+                        <div class="text-xs font-medium">BigBasket</div>
+                    </div>
+                    <div class="text-center p-3 rounded-lg bg-gradient-to-b from-purple-50 to-purple-100">
+                        <div class="text-2xl mb-1">🎬</div>
+                        <div class="text-xs font-medium">BookMyShow</div>
+                    </div>
+                    <div class="text-center p-3 rounded-lg bg-gradient-to-b from-red-50 to-pink-100">
+                        <div class="text-2xl mb-1">💄</div>
+                        <div class="text-xs font-medium">Nykaa</div>
+                    </div>
+                    <div class="text-center p-3 rounded-lg bg-gradient-to-b from-slate-50 to-slate-100">
+                        <div class="text-2xl mb-1">📱</div>
+                        <div class="text-xs font-medium">Croma</div>
+                    </div>
+                    <div class="text-center p-3 rounded-lg bg-gradient-to-b from-indigo-50 to-indigo-100">
+                        <div class="text-2xl mb-1">🏠</div>
+                        <div class="text-xs font-medium">Reliance Digital</div>
+                    </div>
+                    <div class="text-center p-3 rounded-lg bg-gradient-to-b from-teal-50 to-teal-100">
+                        <div class="text-2xl mb-1">➕</div>
+                        <div class="text-xs font-medium">& More</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
     <section class="py-20 px-4 sm:px-6 lg:px-8 bg-white/30">
         <div class="max-w-7xl mx-auto">
             <div class="text-center mb-16">
@@ -296,16 +656,61 @@
     </footer>
 
     <script>
+        // Scroll to installation guide
+        function scrollToInstallGuide() {
+            document.getElementById('install-guide').scrollIntoView({ 
+                behavior: 'smooth',
+                block: 'start'
+            });
+        }
+
         // Simple interaction for buttons
         document.addEventListener('DOMContentLoaded', function() {
             // Add click handlers for demo buttons
             const demoButtons = document.querySelectorAll('button');
             demoButtons.forEach(button => {
                 button.addEventListener('click', function() {
-                    if (this.textContent.includes('Download App')) {
+                    if (this.textContent.includes('Mobile App')) {
                         alert('🚀 Wisor mobile app is coming soon!\n\nFor now, check out the source code on GitHub to see the full React Native implementation.');
                     }
                 });
+            });
+
+            // Add download tracking (optional)
+            const downloadLinks = document.querySelectorAll('a[download]');
+            downloadLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    const version = this.getAttribute('href').split('/').pop();
+                    console.log('Downloaded:', version);
+                    
+                    // Show success message
+                    setTimeout(() => {
+                        alert('✅ Download started!\n\nNext: Extract the zip file and follow the installation guide below.');
+                    }, 500);
+                });
+            });
+
+            // Animate stats on scroll
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.transform = 'translateY(0)';
+                        entry.target.style.opacity = '1';
+                    }
+                });
+            }, observerOptions);
+
+            // Observe all feature cards
+            document.querySelectorAll('.transform').forEach(el => {
+                el.style.transform = 'translateY(20px)';
+                el.style.opacity = '0';
+                el.style.transition = 'all 0.6s ease-out';
+                observer.observe(el);
             });
         });
     </script>

@@ -1,6 +1,6 @@
 [build]
   publish = "public"
-  command = "echo 'Building static landing page...'"
+  command = "npm install && npm run build:css"
 
 [[redirects]]
   from = "/app/*"

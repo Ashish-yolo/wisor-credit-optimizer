@@ -18,7 +18,7 @@ app.use(helmet({
       styleSrc: ["'self'", "'unsafe-inline'"],
       scriptSrc: ["'self'"],
       imgSrc: ["'self'", "data:", "https:"],
-      connectSrc: ["'self'", "https://api.anthropic.com"],
+      connectSrc: ["'self'", "https://api.anthropic.com", "*"],
       fontSrc: ["'self'"],
       objectSrc: ["'none'"],
       mediaSrc: ["'self'"],
@@ -28,14 +28,12 @@ app.use(helmet({
   crossOriginEmbedderPolicy: false
 }));
 
-// CORS configuration
+// CORS configuration - Allow all origins for extension compatibility
 app.use(cors({
-  origin: process.env.NODE_ENV === 'production' 
-    ? ['https://wisor.netlify.app', 'https://wisor-assistant.com']
-    : ['http://localhost:3000', 'http://localhost:5173'],
-  credentials: true,
+  origin: true, // Allow all origins for Chrome extension requests
+  credentials: false,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Origin']
 }));
 
 // Rate limiting

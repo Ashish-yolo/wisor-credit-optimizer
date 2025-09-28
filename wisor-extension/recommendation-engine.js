@@ -3,7 +3,7 @@ class RecommendationEngine {
   constructor() {
     this.userCards = USER_CARDS;
     // Production backend URL - will fallback to local if needed
-    this.backendUrl = 'https://wisor-ai-backend.onrender.com';
+    this.backendUrl = 'https://wisor-credit-optimizer.onrender.com';
     this.fallbackToLocal = true;
     
     // Reactive calculation setup
@@ -71,7 +71,7 @@ class RecommendationEngine {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 45000);
       
-      const response = await fetch(`${this.backendUrl}/api/ai/recommend`, {
+      const response = await fetch(`${this.backendUrl}/api/recommend`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

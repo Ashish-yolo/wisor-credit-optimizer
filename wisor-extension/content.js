@@ -1,4 +1,4 @@
-// Main content script
+// Enhanced content script with web scraper
 class WisorContentScript {
   constructor() {
     this.merchantDetector = new MerchantDetector();
@@ -8,10 +8,211 @@ class WisorContentScript {
     this.isInitialized = false;
     this.currentSubscription = null;
     this.currentMerchant = null;
+    this.extractedOffers = [];
+    this.offerMutationObserver = null;
+    this.initializeOfferScraper();
+  }
+
+  // Initialize web scraper for offers
+  initializeOfferScraper() {
+    // Configuration for different sites
+    this.scraperConfig = {
+      'amazon.in': {
+        selectors: [
+          '.promoPriceBlockMessage',
+          '.savingsPercentage', 
+          '.dealPriceText',
+          '[data-testid="coupon-offer"]',
+          '.a-badge-text'
+        ],
+        keywords: ['off', 'discount', 'save', 'deal', 'offer', 'cashback']
+      },
+      'flipkart.com': {
+        selectors: [
+          '._3Ay6Sb._31Dcoz',
+          '._1_WHN1',
+          '.bankOfferSection',
+          '._2ZdXDB'
+        ],
+        keywords: ['off', 'discount', 'bank offer', 'cashback', 'instant']
+      },
+      'zomato.com': {
+        selectors: [
+          '[data-testid="offer-card"]',
+          '.offer-item',
+          '.coupon-card',
+          '.promo-banner'
+        ],
+        keywords: ['off', 'discount', 'free delivery', 'cashback', 'promo']
+      },
+      'swiggy.com': {
+        selectors: [
+          '[data-testid="offer-widget"]',
+          '.RestaurantOffer__OfferContent',
+          '.offer-meta'
+        ],
+        keywords: ['off', 'discount', 'free', 'cashback', 'combo']
+      }
+    };
+    
+    // Setup mutation observer for dynamic offers
+    this.setupOfferObserver();
+  }
+
+  // Setup mutation observer for offer detection
+  setupOfferObserver() {
+    this.offerMutationObserver = new MutationObserver((mutations) => {
+      let shouldScrape = false;
+      
+      mutations.forEach((mutation) => {
+        if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+          mutation.addedNodes.forEach((node) => {
+            if (node.nodeType === Node.ELEMENT_NODE) {
+              const text = node.textContent?.toLowerCase() || '';
+              if (text.includes('offer') || text.includes('discount') || text.includes('deal')) {
+                shouldScrape = true;
+              }
+            }
+          });
+        }
+      });
+
+      if (shouldScrape) {
+        clearTimeout(this.scrapeTimeout);
+        this.scrapeTimeout = setTimeout(() => this.scrapeOffers(), 2000);
+      }
+    });
+
+    this.offerMutationObserver.observe(document.body, {
+      childList: true,
+      subtree: true
+    });
+  }
+
+  // Scrape offers from current page
+  scrapeOffers() {
+    const hostname = window.location.hostname;
+    const domain = hostname.replace('www.', '').split('.').slice(-2).join('.');
+    const config = this.scraperConfig[domain];
+    
+    if (!config) return;
+
+    console.log('Wisor: Scraping offers on', domain);
+    
+    const offers = [];
+    
+    config.selectors.forEach(selector => {
+      const elements = document.querySelectorAll(selector);
+      elements.forEach(element => {
+        const text = element.textContent || '';
+        const offer = this.extractOfferFromText(text, element);
+        if (offer) {
+          offers.push(offer);
+        }
+      });
+    });
+
+    // Remove duplicates and sort by priority
+    this.extractedOffers = this.processOffers(offers);
+    
+    if (this.extractedOffers.length > 0) {
+      console.log('Wisor: Found', this.extractedOffers.length, 'offers');
+      this.updateWidgetWithOffers();
+    }
+  }
+
+  // Extract offer from text content
+  extractOfferFromText(text, element) {
+    const cleanText = text.trim().toLowerCase();
+    
+    // Look for percentage discounts
+    const percentMatch = cleanText.match(/(\d+)%\s*(off|discount)/);
+    if (percentMatch) {
+      return {
+        discount: `${percentMatch[1]}% off`,
+        description: text.substring(0, 80),
+        priority: parseInt(percentMatch[1]) >= 20 ? 'high' : 'medium',
+        element: element
+      };
+    }
+    
+    // Look for rupee amounts
+    const rupeeMatch = cleanText.match(/₹\s*(\d+(?:,\d+)*)\s*(off|discount|save)/);
+    if (rupeeMatch) {
+      const amount = parseInt(rupeeMatch[1].replace(/,/g, ''));
+      return {
+        discount: `₹${rupeeMatch[1]} off`,
+        description: text.substring(0, 80),
+        priority: amount >= 500 ? 'high' : amount >= 100 ? 'medium' : 'low',
+        element: element
+      };
+    }
+    
+    // Look for general offers
+    if (cleanText.includes('free delivery') || cleanText.includes('cashback')) {
+      return {
+        discount: 'Special offer',
+        description: text.substring(0, 80),
+        priority: 'medium',
+        element: element
+      };
+    }
+    
+    return null;
+  }
+
+  // Process and deduplicate offers
+  processOffers(offers) {
+    // Remove duplicates
+    const unique = offers.filter((offer, index, self) => 
+      self.findIndex(o => o.discount === offer.discount && o.description === offer.description) === index
+    );
+    
+    // Sort by priority
+    return unique.sort((a, b) => {
+      const priorityOrder = { high: 3, medium: 2, low: 1 };
+      return priorityOrder[b.priority] - priorityOrder[a.priority];
+    });
+  }
+
+  // Update widget with scraped offers
+  updateWidgetWithOffers() {
+    if (this.widget && this.extractedOffers.length > 0) {
+      // Add offers section to existing widget
+      const offersSection = this.createOffersSection();
+      const content = this.widget.querySelector('.wisor-content');
+      if (content && !content.querySelector('.wisor-offers')) {
+        content.insertAdjacentHTML('beforeend', offersSection);
+      }
+    }
+  }
+
+  // Create offers section HTML
+  createOffersSection() {
+    const topOffers = this.extractedOffers.slice(0, 3);
+    
+    return `
+      <div class="wisor-offers">
+        <div class="wisor-offers-header">🔥 Live Offers Detected</div>
+        <div class="wisor-offers-list">
+          ${topOffers.map(offer => `
+            <div class="wisor-offer-item wisor-offer-${offer.priority}">
+              <div class="wisor-offer-discount">${offer.discount}</div>
+              <div class="wisor-offer-desc">${offer.description}</div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
   }
 
   init() {
     if (this.isInitialized) return;
+    
+    // Start offer scraping after initialization
+    setTimeout(() => {
+      this.scrapeOffers();
+    }, 3000);
     
     console.log('Wisor: Initializing on', window.location.hostname);
     console.log('Wisor: URL:', window.location.href);

@@ -8,8 +8,14 @@ document.addEventListener('DOMContentLoaded', function() {
   const optimizeBtn = document.getElementById('optimize-btn');
   const settingsBtn = document.getElementById('settings-btn');
 
+  // Login flow variables
+  let currentPhone = '';
+  let userCards = [];
+  let isLoggedIn = false;
+
   // Initialize popup
   initializePopup();
+  setupLoginFlow();
 
   function initializePopup() {
     // Get current tab info
@@ -173,4 +179,202 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
   }
+
+  // Login Flow Functions
+  function setupLoginFlow() {
+    // Check if user is already logged in
+    chrome.storage.local.get(['wisorUserData'], (result) => {
+      if (result.wisorUserData) {
+        isLoggedIn = true;
+        userCards = result.wisorUserData.cards || [];
+        console.log('User already logged in');
+      } else {
+        // Show login overlay for new users
+        setTimeout(() => {
+          showLoginOverlay();
+        }, 1000);
+      }
+    });
+
+    // Setup form handlers
+    document.getElementById('phone-form').addEventListener('submit', handlePhoneSubmit);
+    document.getElementById('otp-form').addEventListener('submit', handleOtpSubmit);
+    
+    // Setup OTP input handlers
+    setupOtpInputs();
+  }
+
+  function showLoginOverlay() {
+    document.getElementById('login-overlay').classList.remove('hidden');
+  }
+
+  function handlePhoneSubmit(e) {
+    e.preventDefault();
+    const phoneInput = document.getElementById('phone-input');
+    const phone = phoneInput.value;
+    
+    if (phone.length !== 10) {
+      alert('Please enter a valid 10-digit phone number');
+      return;
+    }
+
+    currentPhone = phone;
+    document.getElementById('phone-display').textContent = `+91 ${phone}`;
+    
+    // For demo numbers, auto-fill OTP
+    if (phone === '9999999999' || phone === '1234567890') {
+      setTimeout(() => {
+        const otpInputs = document.querySelectorAll('.otp-digit');
+        const demoOtp = ['1', '2', '3', '4', '5', '6'];
+        otpInputs.forEach((input, index) => {
+          input.value = demoOtp[index];
+        });
+      }, 1500);
+    }
+    
+    goToStep('otp');
+  }
+
+  function handleOtpSubmit(e) {
+    e.preventDefault();
+    const otpInputs = document.querySelectorAll('.otp-digit');
+    const otp = Array.from(otpInputs).map(input => input.value).join('');
+    
+    if (otp.length !== 6) {
+      alert('Please enter complete 6-digit OTP');
+      return;
+    }
+
+    if (otp === '123456' || otp === '000000') {
+      goToStep('card');
+    } else {
+      alert('Invalid OTP. For demo, use 123456');
+      // Clear OTP inputs
+      otpInputs.forEach(input => input.value = '');
+      otpInputs[0].focus();
+    }
+  }
+
+  function setupOtpInputs() {
+    const otpInputs = document.querySelectorAll('.otp-digit');
+    otpInputs.forEach((input, index) => {
+      input.addEventListener('input', (e) => {
+        if (e.target.value.length === 1 && index < otpInputs.length - 1) {
+          otpInputs[index + 1].focus();
+        }
+      });
+      
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Backspace' && e.target.value === '' && index > 0) {
+          otpInputs[index - 1].focus();
+        }
+      });
+    });
+  }
+
+  // Global functions for HTML onclick handlers
+  window.goToStep = function(step) {
+    document.querySelectorAll('.login-step').forEach(s => s.classList.add('hidden'));
+    document.getElementById(step + '-step').classList.remove('hidden');
+  };
+
+  window.closeLogin = function() {
+    document.getElementById('login-overlay').classList.add('hidden');
+  };
+
+  window.addQuickCard = function(cardName, cardBank) {
+    const card = {
+      id: Date.now().toString(),
+      name: cardName,
+      bank: cardBank,
+      lastFour: Math.random().toString().slice(2, 6),
+      isActive: true
+    };
+    
+    userCards.push(card);
+    updateAddedCardsDisplay();
+    
+    // Show continue button if cards added
+    if (userCards.length > 0) {
+      document.getElementById('continue-btn').classList.remove('hidden');
+    }
+  };
+
+  function updateAddedCardsDisplay() {
+    const addedCardsContainer = document.getElementById('added-cards');
+    addedCardsContainer.innerHTML = userCards.map(card => `
+      <div class="added-card">
+        <span class="card-icon">💳</span>
+        <div>
+          <div class="card-name">${card.name}</div>
+          <div class="card-details">${card.bank} •••• ${card.lastFour}</div>
+        </div>
+      </div>
+    `).join('');
+    
+    document.getElementById('cards-added').textContent = userCards.length;
+  }
+
+  window.downloadWisorLink = function() {
+    const wisorLinkContent = `<!DOCTYPE html>
+<html>
+<head>
+    <title>Wisor - Your Credit Card Assistant</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; 
+               text-align: center; padding: 50px 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+               color: white; margin: 0; }
+        .container { max-width: 400px; margin: 0 auto; }
+        .logo { font-size: 3em; margin-bottom: 20px; }
+        h1 { margin: 0 0 10px 0; }
+        p { opacity: 0.9; margin-bottom: 30px; }
+        .btn { background: rgba(255,255,255,0.2); border: 2px solid white; color: white; 
+               padding: 15px 30px; border-radius: 50px; text-decoration: none; 
+               display: inline-block; transition: all 0.3s; cursor: pointer; }
+        .btn:hover { background: white; color: #667eea; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">💳</div>
+        <h1>Wisor Enhanced</h1>
+        <p>Your AI-powered credit card optimization assistant</p>
+        <button class="btn" onclick="alert('Wisor Extension Active! Keep this link handy.')">
+            🚀 Launch Wisor
+        </button>
+        <p style="margin-top: 30px; font-size: 0.9em; opacity: 0.7;">
+            Cards: ${userCards.length} • Phone: +91 ${currentPhone}
+        </p>
+    </div>
+</body>
+</html>`;
+    
+    // Create download
+    const blob = new Blob([wisorLinkContent], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'wisor-enhanced-link.html';
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  window.completeLogin = function() {
+    // Save user data
+    const userData = {
+      phone: currentPhone,
+      cards: userCards,
+      isVerified: true,
+      loginTimestamp: Date.now()
+    };
+    
+    chrome.storage.local.set({ wisorUserData: userData }, () => {
+      isLoggedIn = true;
+      closeLogin();
+      
+      // Refresh popup to show logged-in state
+      location.reload();
+    });
+  };
 });

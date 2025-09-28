@@ -1,0 +1,87 @@
+{
+  "manifest_version": 3,
+  "name": "Wisor - Enhanced Credit Card Assistant",
+  "version": "3.0.0",
+  "description": "AI-powered credit card optimization with web scraping, world-class login flow, and intelligent offer detection. Maximize savings with personalized recommendations.",
+  
+  "permissions": [
+    "activeTab",
+    "storage",
+    "tabs"
+  ],
+  
+  "host_permissions": [
+    "http://localhost:3001/*",
+    "https://wisor-credit-optimizer.onrender.com/*",
+    "https://api.wisor.app/*",
+    "https://*/*"
+  ],
+  
+  "background": {
+    "service_worker": "src/background/enhanced-background.js",
+    "type": "module"
+  },
+  
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.amazon.in/*",
+        "https://www.flipkart.com/*",
+        "https://www.myntra.com/*",
+        "https://www.zomato.com/*",
+        "https://www.swiggy.com/*",
+        "https://www.makemytrip.com/*",
+        "https://www.goibibo.com/*",
+        "https://www.bookmyshow.com/*",
+        "https://www.bigbasket.com/*",
+        "https://www.reliancedigital.in/*",
+        "https://www.croma.com/*",
+        "https://www.nykaa.com/*",
+        "https://www.ajio.com/*",
+        "https://paytm.com/*",
+        "https://www.phonepe.com/*",
+        "https://www.ola.com/*",
+        "https://www.uber.com/*"
+      ],
+      "js": [
+        "credit-cards-data.js",
+        "enhanced-card-service.js",
+        "merchant-detector.js",
+        "recommendation-engine.js",
+        "card-detector.js",
+        "src/content/ScraperAgent.js",
+        "src/content/content-script.js",
+        "content.js"
+      ],
+      "css": [
+        "wisor-overlay.css",
+        "src/ui/enhanced-styles.css"
+      ],
+      "run_at": "document_end"
+    }
+  ],
+  
+  "action": {
+    "default_popup": "enhanced-popup.html",
+    "default_title": "Wisor - Smart Credit Card Assistant"
+  },
+  
+  "options_page": "options.html",
+  
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "src/ui/enhanced-styles.css",
+        "icons/*",
+        "assets/*"
+      ],
+      "matches": ["<all_urls>"]
+    }
+  ],
+  
+  "icons": {
+    "16": "icons/icon-16.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  }
+}

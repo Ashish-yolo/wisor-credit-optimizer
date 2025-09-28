@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wisor Enhanced - Credit Card Assistant</title>
+  <link rel="stylesheet" href="src/ui/enhanced-styles.css">
+</head>
+<body>
+  <div id="popup-container" class="popup-container">
+    <!-- Content will be dynamically loaded by enhanced-popup.js -->
+    <div class="loading-state">
+      <div class="popup-header">
+        <div class="logo">
+          <span class="logo-icon">💳</span>
+          <span class="logo-text">Wisor</span>
+        </div>
+        <div class="header-badge">Enhanced</div>
+      </div>
+      
+      <div class="loading-content">
+        <div class="spinner"></div>
+        <p>Loading Wisor...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="credit-cards-data.js"></script>
+  <script src="src/ui/enhanced-popup.js"></script>
+</body>
+</html>

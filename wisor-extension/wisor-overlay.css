@@ -282,3 +282,401 @@
   opacity: 0.7;
   transform: scale(0.98);
 }
+
+/* Enhanced styles for offers section */
+.wisor-offers {
+  padding: 15px 0;
+  border-top: 1px solid #e5e7eb;
+}
+
+.wisor-offers-header {
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.wisor-offers-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.wisor-offer-item {
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
+  background: #f9fafb;
+  font-size: 12px;
+}
+
+.wisor-offer-high {
+  border-color: #dc2626;
+  background: #fef2f2;
+}
+
+.wisor-offer-medium {
+  border-color: #f59e0b;
+  background: #fffbeb;
+}
+
+.wisor-offer-low {
+  border-color: #10b981;
+  background: #f0fdf4;
+}
+
+.wisor-offer-discount {
+  font-weight: 700;
+  color: #dc2626;
+  margin-bottom: 3px;
+}
+
+.wisor-offer-desc {
+  color: #6b7280;
+  line-height: 1.3;
+}
+
+/* Login Flow Styles */
+.login-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(10px);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-overlay.hidden {
+  display: none;
+}
+
+.login-container {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  width: 90%;
+  max-width: 400px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.login-step {
+  padding: 30px;
+}
+
+.login-step.hidden {
+  display: none;
+}
+
+.login-header {
+  text-align: center;
+  margin-bottom: 25px;
+}
+
+.login-header h2 {
+  margin: 0 0 8px 0;
+  font-size: 1.4em;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.login-header p {
+  margin: 0;
+  color: #6b7280;
+  font-size: 0.9em;
+}
+
+.success-icon {
+  font-size: 2.5em;
+  margin-bottom: 15px;
+}
+
+.login-features {
+  margin: 25px 0;
+}
+
+.feature-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 15px;
+  padding: 12px;
+  border-radius: 8px;
+  background: #f9fafb;
+}
+
+.feature-icon {
+  font-size: 1.2em;
+  margin-top: 2px;
+}
+
+.feature-item h4 {
+  margin: 0 0 4px 0;
+  font-size: 0.9em;
+  font-weight: 600;
+}
+
+.feature-item p {
+  margin: 0;
+  font-size: 0.8em;
+  color: #6b7280;
+}
+
+.demo-notice {
+  background: linear-gradient(135deg, #dbeafe, #ede9fe);
+  border: 1px solid #c7d2fe;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 20px;
+  text-align: center;
+  font-size: 0.85em;
+  color: #5b21b6;
+}
+
+.phone-input {
+  display: flex;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 15px;
+  transition: border-color 0.2s;
+}
+
+.phone-input:focus-within {
+  border-color: #3b82f6;
+}
+
+.country-code {
+  background: #f9fafb;
+  padding: 12px;
+  font-weight: 600;
+  color: #374151;
+  border-right: 1px solid #e5e7eb;
+}
+
+.phone-input input {
+  flex: 1;
+  border: none;
+  padding: 12px;
+  font-size: 1em;
+  outline: none;
+}
+
+.otp-inputs {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin: 20px 0;
+}
+
+.otp-digit {
+  width: 40px;
+  height: 40px;
+  border: 2px solid #e5e7eb;
+  border-radius: 6px;
+  text-align: center;
+  font-size: 1.1em;
+  font-weight: 600;
+  outline: none;
+  transition: all 0.2s;
+}
+
+.otp-digit:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.quick-cards h4 {
+  margin: 0 0 12px 0;
+  font-size: 0.9em;
+  font-weight: 600;
+  color: #374151;
+}
+
+.card-grid {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.quick-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: left;
+  width: 100%;
+}
+
+.quick-card:hover {
+  border-color: #3b82f6;
+  background: #f8fafc;
+  transform: translateY(-1px);
+}
+
+.card-icon {
+  font-size: 1.2em;
+}
+
+.card-name {
+  font-weight: 600;
+  font-size: 0.85em;
+  margin-bottom: 2px;
+}
+
+.card-bank {
+  font-size: 0.75em;
+  color: #6b7280;
+}
+
+.added-cards {
+  margin-bottom: 15px;
+}
+
+.added-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  background: #f0f9ff;
+  border: 1px solid #bae6fd;
+  border-radius: 6px;
+  margin-bottom: 8px;
+}
+
+.card-details {
+  font-size: 0.75em;
+  color: #6b7280;
+}
+
+.card-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.success-stats {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  margin: 25px 0;
+}
+
+.stat {
+  text-align: center;
+}
+
+.stat-number {
+  display: block;
+  font-size: 1.5em;
+  font-weight: 700;
+  color: #3b82f6;
+}
+
+.stat-label {
+  font-size: 0.8em;
+  color: #6b7280;
+}
+
+.download-section {
+  background: linear-gradient(135deg, #f0f9ff, #faf5ff);
+  border: 1px solid #c7d2fe;
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.download-section h3 {
+  margin: 0 0 15px 0;
+  font-size: 1em;
+}
+
+.download-note {
+  margin: 10px 0 0 0;
+  font-size: 0.8em;
+  color: #6b7280;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  width: 100%;
+  font-size: 0.9em;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+}
+
+.btn-primary.hidden {
+  display: none;
+}
+
+.btn-text {
+  background: none;
+  color: #3b82f6;
+  border: none;
+  padding: 8px 16px;
+  cursor: pointer;
+  text-decoration: underline;
+  font-size: 0.85em;
+}
+
+.btn-text:hover {
+  color: #1d4ed8;
+}
+
+.login-close {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: rgba(0, 0, 0, 0.1);
+  border: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 1.1em;
+  color: #6b7280;
+  transition: all 0.2s;
+}
+
+.login-close:hover {
+  background: rgba(0, 0, 0, 0.2);
+  transform: scale(1.1);
+}

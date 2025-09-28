@@ -73,6 +73,144 @@
     </div>
   </div>
 
+  <!-- Login Flow Overlay -->
+  <div id="login-overlay" class="login-overlay hidden">
+    <div class="login-container">
+      <!-- Welcome Step -->
+      <div id="welcome-step" class="login-step">
+        <div class="login-header">
+          <h2>Welcome to Wisor Enhanced!</h2>
+          <p>Get personalized card recommendations & live offer detection</p>
+        </div>
+        <div class="login-features">
+          <div class="feature-item">
+            <span class="feature-icon">🤖</span>
+            <div>
+              <h4>AI Recommendations</h4>
+              <p>Smart card suggestions for every purchase</p>
+            </div>
+          </div>
+          <div class="feature-item">
+            <span class="feature-icon">🔥</span>
+            <div>
+              <h4>Live Offer Detection</h4>
+              <p>Automatically finds the best deals</p>
+            </div>
+          </div>
+        </div>
+        <button class="btn-primary" onclick="goToStep('phone')">Get Started</button>
+        <button class="btn-text" onclick="closeLogin()">Maybe Later</button>
+      </div>
+
+      <!-- Phone Step -->
+      <div id="phone-step" class="login-step hidden">
+        <div class="login-header">
+          <h2>Enter Your Phone Number</h2>
+          <p>We'll send you a verification code</p>
+        </div>
+        <div class="demo-notice">
+          <strong>Demo Mode:</strong> Use 9999999999 for instant demo
+        </div>
+        <form id="phone-form">
+          <div class="phone-input">
+            <span class="country-code">+91</span>
+            <input type="tel" id="phone-input" placeholder="9999999999" maxlength="10" required>
+          </div>
+          <button type="submit" class="btn-primary">Send OTP</button>
+        </form>
+        <button class="btn-text" onclick="goToStep('welcome')">← Back</button>
+      </div>
+
+      <!-- OTP Step -->
+      <div id="otp-step" class="login-step hidden">
+        <div class="login-header">
+          <h2>Enter Verification Code</h2>
+          <p>We sent a 6-digit code to <span id="phone-display"></span></p>
+        </div>
+        <form id="otp-form">
+          <div class="otp-inputs">
+            <input type="text" class="otp-digit" maxlength="1" autocomplete="off">
+            <input type="text" class="otp-digit" maxlength="1" autocomplete="off">
+            <input type="text" class="otp-digit" maxlength="1" autocomplete="off">
+            <input type="text" class="otp-digit" maxlength="1" autocomplete="off">
+            <input type="text" class="otp-digit" maxlength="1" autocomplete="off">
+            <input type="text" class="otp-digit" maxlength="1" autocomplete="off">
+          </div>
+          <button type="submit" class="btn-primary">Verify Code</button>
+        </form>
+        <button class="btn-text" onclick="goToStep('phone')">← Change Number</button>
+      </div>
+
+      <!-- Add Card Step -->
+      <div id="card-step" class="login-step hidden">
+        <div class="login-header">
+          <h2>Add Your Credit Card</h2>
+          <p>Add at least one card for personalized recommendations</p>
+        </div>
+        <div id="added-cards" class="added-cards"></div>
+        <div class="quick-cards">
+          <h4>Quick Add Popular Cards:</h4>
+          <div class="card-grid">
+            <button class="quick-card" onclick="addQuickCard('HDFC Millennia', 'HDFC Bank')">
+              <span class="card-icon">💳</span>
+              <div>
+                <div class="card-name">HDFC Millennia</div>
+                <div class="card-bank">HDFC Bank</div>
+              </div>
+            </button>
+            <button class="quick-card" onclick="addQuickCard('SBI SimplyCLICK', 'SBI')">
+              <span class="card-icon">💳</span>
+              <div>
+                <div class="card-name">SBI SimplyCLICK</div>
+                <div class="card-bank">State Bank of India</div>
+              </div>
+            </button>
+            <button class="quick-card" onclick="addQuickCard('ICICI Amazon Pay', 'ICICI Bank')">
+              <span class="card-icon">💳</span>
+              <div>
+                <div class="card-name">ICICI Amazon Pay</div>
+                <div class="card-bank">ICICI Bank</div>
+              </div>
+            </button>
+          </div>
+        </div>
+        <div class="card-actions">
+          <button id="continue-btn" class="btn-primary hidden" onclick="goToStep('success')">Continue</button>
+          <button class="btn-text" onclick="goToStep('otp')">← Back</button>
+        </div>
+      </div>
+
+      <!-- Success Step -->
+      <div id="success-step" class="login-step hidden">
+        <div class="login-header">
+          <div class="success-icon">✅</div>
+          <h2>You're All Set!</h2>
+          <p>Welcome to Wisor - your optimization journey begins now</p>
+        </div>
+        <div class="success-stats">
+          <div class="stat">
+            <span class="stat-number" id="cards-added">0</span>
+            <span class="stat-label">Cards Added</span>
+          </div>
+          <div class="stat">
+            <span class="stat-number">∞</span>
+            <span class="stat-label">Savings Potential</span>
+          </div>
+        </div>
+        <div class="download-section">
+          <h3>🔗 Your Wisor Link is Ready!</h3>
+          <button class="btn-primary" onclick="downloadWisorLink()">
+            📱 Download Wisor Link
+          </button>
+          <p class="download-note">Install this link to access Wisor from anywhere</p>
+        </div>
+        <button class="btn-text" onclick="completeLogin()">Close</button>
+      </div>
+
+      <button class="login-close" onclick="closeLogin()">×</button>
+    </div>
+  </div>
+
   <script src="credit-cards-data.js"></script>
   <script src="popup.js"></script>
 </body>

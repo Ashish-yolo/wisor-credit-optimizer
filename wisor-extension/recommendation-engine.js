@@ -18,35 +18,20 @@ class RecommendationEngine {
 
     console.log('Wisor: Starting recommendation process...');
 
-    // Start both Claude and local recommendations in parallel
-    const claudePromise = this.getClaudeRecommendation(merchant, cartValue)
-      .catch(error => {
-        console.log('Wisor: Claude API failed:', error.message);
-        return null;
-      });
-    
-    const localPromise = new Promise(resolve => {
-      setTimeout(() => {
-        console.log('Wisor: 20 second timeout - showing local recommendations');
-        resolve(this.getLocalRecommendation(merchant, cartValue));
-      }, 20000); // Show local after 20 seconds
-    });
-
-    // Return whichever comes first
-    const result = await Promise.race([claudePromise, localPromise]);
-    
-    // If Claude responded, mark as AI-powered
-    if (result && !result.aiPowered) {
-      const claudeResult = await Promise.race([
-        claudePromise,
-        new Promise(resolve => setTimeout(() => resolve(null), 1000))
-      ]);
+    // Try Claude first with a timeout
+    try {
+      const claudeResult = await this.getClaudeRecommendation(merchant, cartValue);
       if (claudeResult) {
+        console.log('Wisor: Claude recommendation received successfully');
         return claudeResult;
       }
+    } catch (error) {
+      console.log('Wisor: Claude API failed:', error.message);
     }
-    
-    return result;
+
+    // Fall back to local recommendations if Claude fails or returns null
+    console.log('Wisor: Using local recommendations fallback');
+    return this.getLocalRecommendation(merchant, cartValue);
   }
 
   async getClaudeRecommendation(merchant, cartValue) {

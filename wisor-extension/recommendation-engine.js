@@ -20,13 +20,16 @@ class RecommendationEngine {
 
     // Try Claude first with a timeout
     try {
+      console.log('Wisor: Attempting Claude API call...');
       const claudeResult = await this.getClaudeRecommendation(merchant, cartValue);
       if (claudeResult) {
-        console.log('Wisor: Claude recommendation received successfully');
+        console.log('Wisor: Claude recommendation received successfully, using Claude result');
         return claudeResult;
+      } else {
+        console.log('Wisor: Claude API returned null/empty result, falling back to local');
       }
     } catch (error) {
-      console.log('Wisor: Claude API failed:', error.message);
+      console.log('Wisor: Claude API failed with error:', error.message);
     }
 
     // Fall back to local recommendations if Claude fails or returns null
@@ -76,9 +79,13 @@ class RecommendationEngine {
       }
 
       const data = await response.json();
+      console.log('Wisor: Claude API response:', data);
       
       if (data.success && data.recommendation) {
         return this.formatClaudeRecommendation(data.recommendation, merchant, cartValue);
+      } else {
+        console.log('Wisor: Claude API returned unsuccessful response:', { success: data.success, hasRecommendation: !!data.recommendation });
+        return null;
       }
     } catch (error) {
       console.error('Wisor: Claude API error:', error);

@@ -167,7 +167,9 @@ class RecommendationEngine {
     console.log('Wisor: Generating enhanced local recommendations...');
     
     const recommendations = [];
-    const merchantLower = merchant.toLowerCase();
+    // Handle both string and object merchant formats
+    const merchantName = typeof merchant === 'string' ? merchant : (merchant.name || merchant.hostname || 'unknown');
+    const merchantLower = merchantName.toLowerCase();
     
     // Enhanced merchant-specific logic
     const merchantRules = {
@@ -286,8 +288,10 @@ class RecommendationEngine {
     let description = '';
     
     // Check if card has specific benefit for this merchant's category
-    const merchantCategory = merchant.category;
-    const merchantSubcategory = merchant.subcategory;
+    // Handle both string and object merchant formats
+    const merchantObj = typeof merchant === 'string' ? { name: merchant, category: 'general' } : merchant;
+    const merchantCategory = merchantObj.category || 'general';
+    const merchantSubcategory = merchantObj.subcategory;
     
     // Priority order: specific merchant > subcategory > category > general
     let applicableBenefit = null;
